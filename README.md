@@ -10,6 +10,9 @@ the hob.
 Built with Nuxt 4, Nuxt UI and Nuxt Content. Deployed to S3 behind CloudFront
 via the CDK stacks in `cdk/`.
 
+For the workspace layout and the deployment commands, see
+[DEVELOPMENT.md](DEVELOPMENT.md).
+
 ## Setup
 
 ```bash
