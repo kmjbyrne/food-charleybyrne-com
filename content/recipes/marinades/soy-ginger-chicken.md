@@ -1,6 +1,6 @@
 ---
 title: Chicken Soy Marinade
-category: Marinade
+category: Marinades
 tags:
   - soy
   - ginger

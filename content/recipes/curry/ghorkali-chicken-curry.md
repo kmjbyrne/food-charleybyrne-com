@@ -1,7 +1,7 @@
 ---
 title: Ghorkali Chicken Curry
 description: Delicious Nepalese inspired Ghorkali curry dish
-category: Currry
+category: Curry
 tags:
   - curry
   - nepal

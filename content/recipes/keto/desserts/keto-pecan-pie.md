@@ -1,6 +1,6 @@
 ---
 title: Keto Pecan Pie
-category: Dessert
+category: Desserts
 tags:
   - keto
   - pecan
