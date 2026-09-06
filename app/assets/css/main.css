@@ -918,17 +918,10 @@ body.card-open > #__nuxt {
   display: contents;
 }
 
-/* Sits on the line of the heading above it rather than taking its own row. */
 .sub-recipe-head {
-  margin: -1.85rem 0 0;
+  margin: 0.25rem 0 -0.6rem;
   font-size: 0.75rem;
   font-weight: 500;
-  text-align: right;
-  pointer-events: none;
-}
-
-.sub-recipe-head .sub-recipe-title {
-  pointer-events: auto;
 }
 
 /* A rule separates the borrowed ingredients from the recipe's own. */

@@ -16,7 +16,7 @@ const recipe = computed(() => props.recipe)
 const chosen = ref<Record<string, string>>({})
 const slug = computed(() => recipe.value?.path ?? '')
 
-const { data: related } = await useAsyncData(() => `related-${slug.value}`, () =>
+const { data: related } = useAsyncData(() => `related-${slug.value}`, () =>
   queryCollection('recipes')
     .where('category', '=', recipe.value?.category ?? '')
     .where('path', '<>', slug.value)
@@ -454,7 +454,7 @@ const copyRecipe = async () => {
 }
 
 // A mother sauce lists what derives from it, pulled from the sibling files.
-const { data: derivatives } = await useAsyncData(
+const { data: derivatives } = useAsyncData(
   () => `derivatives-${slug.value}`,
   async () => {
     if (!recipe.value?.motherSauce || !slug.value) return []
@@ -483,7 +483,7 @@ const trail = computed(() => {
 })
 
 // A daughter sauce points back up to the mother it derives from.
-const { data: parents } = await useAsyncData(
+const { data: parents } = useAsyncData(
   () => `parents-${slug.value}`,
   async () => {
     const refs = recipe.value?.links ?? []
@@ -500,7 +500,7 @@ const motherOf = computed(() => parents.value?.find(p => p.motherSauce) ?? null)
 
 // A composite recipe is assembled from others that each stand alone, so the
 // parts are pulled in whole rather than copied.
-const { data: components } = await useAsyncData(
+const { data: components } = useAsyncData(
   () => `components-${slug.value}`,
   async () => {
     const parts = recipe.value?.components ?? []
@@ -520,21 +520,27 @@ const { data: components } = await useAsyncData(
 
 const variantGroups = computed(() => recipe.value?.variants ?? [])
 
-// Restore the selection from a query param or a variant path segment, so
-// /sauces/bechamel/soubise/keto opens on that variant.
-watchEffect(() => {
+// Seed the selection from the route before anything reads it. Query params and
+// path segments are slugs, so they resolve back to the option's own label.
+const seedFromRoute = () => {
   const leaf = route.path.split('/').filter(Boolean).at(-1) ?? ''
+  const next: Record<string, string> = {}
 
   for (const group of variantGroups.value) {
-    if (chosen.value[group.name]) continue
-
-    // Query params and path segments are slugs, so resolve them back to the
-    // option's own label rather than storing the slug.
     const raw = route.query[queryKey(group.name)]
     const wanted = raw ? slugify(String(raw)) : slugify(leaf)
     const match = (group.options ?? []).find(o => slugify(o) === wanted)
-    if (match) chosen.value[group.name] = match
+    if (match) next[group.name] = match
   }
+  if (Object.keys(next).length) chosen.value = { ...next, ...chosen.value }
+}
+
+seedFromRoute()
+
+watch(() => route.fullPath, () => {
+  chosen.value = {}
+  seedFromRoute()
+  nextTick(applyVariants)
 })
 
 // Variant subsections share everything before them; only the chosen one shows.

@@ -11,6 +11,9 @@ const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 const { search } = useRecipeFilters()
+const { recent, load: loadRecent, clear: clearRecent } = useRecentRecipes()
+
+onMounted(loadRecent)
 
 const { data: allPaths } = await useAsyncData('all-paths', () =>
   queryCollection('recipes').select('path').all()
@@ -137,6 +140,70 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
     />
 
     <div class="flex items-center gap-1 ml-auto shrink-0">
+      <UPopover>
+        <UButton
+          icon="i-lucide-history"
+          color="neutral"
+          variant="ghost"
+          size="sm"
+          aria-label="Recently viewed"
+          title="Recently viewed"
+        />
+        <template #content>
+          <div class="p-2 w-64">
+            <p class="px-2 pt-1 pb-2 text-[11px] font-semibold uppercase tracking-widest text-(--ui-text-dimmed) flex items-center justify-between">
+              Recently viewed
+              <button
+                v-if="recent.length"
+                class="font-medium tracking-normal normal-case hover:text-(--ui-text) transition-colors"
+                @click="clearRecent"
+              >
+                Clear
+              </button>
+            </p>
+            <p
+              v-if="!recent.length"
+              class="px-2 py-3 text-[13px] text-(--ui-text-dimmed)"
+            >
+              Nothing yet. Recipes you open show up here.
+            </p>
+            <ul
+              v-else
+              class="flex flex-col gap-0.5"
+            >
+              <li
+                v-for="r in recent"
+                :key="r.path"
+              >
+                <NuxtLink
+                  :to="r.path"
+                  class="flex items-center gap-2 px-2 py-1.5 rounded-md text-[13px] transition-colors"
+                  :class="$route.path === r.path
+                    ? 'bg-primary-500/12 text-primary-500 font-medium'
+                    : 'text-(--ui-text-muted) hover:bg-(--ui-bg-elevated) hover:text-(--ui-text)'"
+                >
+                  <UIcon
+                    name="i-lucide-clock"
+                    class="size-3 shrink-0 opacity-50"
+                  />
+                  <span class="truncate">{{ r.title }}</span>
+                </NuxtLink>
+              </li>
+            </ul>
+          </div>
+        </template>
+      </UPopover>
+
+      <UButton
+        to="/finder"
+        icon="i-lucide-search-check"
+        color="neutral"
+        variant="ghost"
+        size="sm"
+        aria-label="What can I make?"
+        title="What can I make?"
+      />
+
       <UButton
         to="/map"
         icon="i-lucide-git-fork"
