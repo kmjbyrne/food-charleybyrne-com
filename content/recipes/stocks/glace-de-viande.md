@@ -42,4 +42,5 @@ Bones, mirepoix and time. The pressure cooker does in three hours what an open p
 
 - Do not salt it. This reduces to a fifth of its volume, so anything you season now becomes inedible later.
 - It should set to a firm jelly when cold. If it stays loose, it needs more reduction.
+- The same method makes a :nuxt-link{to="/stocks/chicken-stock"}[chicken stock], but at two hours rather than three.
 - Vinegar in the deglaze helps draw gelatin from the bones and keeps the finished glace from tasting flat.

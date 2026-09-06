@@ -19,6 +19,16 @@ const route = useRoute()
 // Breadcrumbs let you step back up without opening the sidebar.
 const tree = useCategoryTree(computed(() => allRecipes.value ?? []))
 
+const { data: added } = await useAsyncData('recently-added', () => $fetch('/api/recent'))
+
+const recentlyAdded = computed(() => {
+  const byPath = new Map((allRecipes.value ?? []).map(r => [r.path, r]))
+  return (added.value ?? [])
+    .map(entry => byPath.get(entry.path))
+    .filter(Boolean)
+    .slice(0, 5)
+})
+
 const crumbs = computed(() => {
   const out: { label: string, to: string, query?: Record<string, string> }[] = [
     { label: 'All recipes', to: '/' }
@@ -64,6 +74,29 @@ onMounted(loadRecent)
               class="size-3 shrink-0 opacity-50 group-hover:text-primary-500 group-hover:opacity-100"
             />
             <span class="truncate max-w-52">{{ r.title }}</span>
+          </NuxtLink>
+        </div>
+      </section>
+
+      <section
+        v-if="showRecent && recentlyAdded.length"
+        class="mb-8"
+      >
+        <h2 class="text-[11px] font-semibold uppercase tracking-widest text-(--ui-text-dimmed) mb-3">
+          Recently added
+        </h2>
+        <div class="flex flex-wrap gap-2">
+          <NuxtLink
+            v-for="r in recentlyAdded"
+            :key="r!.path"
+            :to="recipeUrl(r!.path)"
+            class="group flex items-center gap-2 pl-2.5 pr-3 py-1.5 rounded-lg border border-(--ui-border) bg-(--ui-bg) text-[13px] text-(--ui-text-muted) hover:border-primary-500 hover:text-(--ui-text) transition-colors"
+          >
+            <UIcon
+              name="i-lucide-sparkles"
+              class="size-3 shrink-0 opacity-50 group-hover:text-primary-500 group-hover:opacity-100"
+            />
+            <span class="truncate max-w-52">{{ r!.title }}</span>
           </NuxtLink>
         </div>
       </section>

@@ -21,6 +21,8 @@ Velouté is just stock and roux. All the flavour comes from the stock, so a weak
 one gives you thickened water. It is the base for suprême, allemande and a lot
 of pan sauces.
 
+:sub-recipe{path="/recipes/stocks/chicken-stock" section="Ingredients" label="White chicken stock, made ahead"}
+
 ## Ingredients
 
 - 60g butter

@@ -6,7 +6,7 @@ export const useRecipeFilters = () => {
 
   // Categories and recipes share one namespace, so a listing page is any route
   // that is not a recipe or a reserved section.
-  const RESERVED = ['techniques', 'map']
+  const RESERVED = ['techniques', 'map', 'finder']
 
   const isListing = computed(() => {
     const segments = route.path.split('/').filter(Boolean)

@@ -13,8 +13,9 @@ category: Sauces
 variants:
   - name: Base
     section: Ingredients
-    options: [Classical, Cream]
+    options: [Classical, Keto, Cream]
     default: Classical
+    titlePrefix: true
 paths:
   - sauces/cooking
 tags:
@@ -46,6 +47,14 @@ without splitting.
 - 50ml cream, optional
 - Salt and white pepper
 
+### Keto, on keto bechamel
+
+:sub-recipe{path="/recipes/sauces/bechamel" section="Ingredients" variant="Keto" label="Keto bechamel base"}
+
+- 2 large onions, finely sliced
+- 30g butter
+- Salt and white pepper
+
 ### Cream, no roux
 
 - 2 medium onions, thinly sliced
@@ -65,6 +74,14 @@ without splitting.
 4. Blend smooth, then pass through a fine sieve.
 5. Stir in the cream if using. Season.
 
+### Keto
+
+1. Melt the butter over low heat. Add the onions with a pinch of salt.
+2. Cover and sweat 25 to 30 minutes, keeping them pale.
+3. Stir the onions into the warm keto bechamel and simmer 5 minutes. It is
+   already thick, so it needs less time than the classical version.
+4. Blend smooth and pass through a fine sieve. Season.
+
 ### Cream
 
 1. Melt the butter over low heat and add the onions with a good pinch of salt.
@@ -80,5 +97,7 @@ without splitting.
   onion soup and turns the sauce beige.
 - The cream version depends on reduction for its body, so do not cut the
   simmering short. It thickens noticeably as it cools.
+- The keto version inherits the keto bechamel, which is already thick from the
+  cream cheese. Simmer it less or it turns claggy.
 - Vadouvan is the interesting option in the cream version. It is a French
   adaptation of a masala, so it sits naturally in an onion sauce.

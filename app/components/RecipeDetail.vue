@@ -56,13 +56,33 @@ const collectList = (tag: 'ul' | 'ol'): string[] => {
 const ingredientList = computed(() => collectList('ul'))
 const stepList = computed(() => collectList('ol'))
 
+// A diet-style group can qualify the title, so "Keto BBQ Sauce" reads correctly
+// without duplicating the recipe.
+const displayTitle = computed(() => {
+  const base = recipe.value?.title ?? ''
+  const group = variantGroups.value.find(g => g.titlePrefix)
+  if (!group) return base
+  const pick = chosen.value[group.name]
+  if (!pick) return base
+
+  // The canonical title may already carry a diet word; swap it for the choice
+  // rather than stacking a second one in front.
+  const others = (group.options ?? []).filter(o => o !== pick)
+  const carried = others.find(o => new RegExp(`\\b${o}\\b`, 'i').test(base))
+  if (carried) {
+    return base.replace(new RegExp(`\\s*\\b${carried}\\b`, 'i'), pick === 'Standard' ? '' : ` ${pick}`).replace(/\s+/g, ' ').trim()
+  }
+  if (base.toLowerCase().includes(pick.toLowerCase())) return base
+  return pick === 'Standard' ? base : `${pick} ${base}`
+})
+
 const site = 'https://food.charleybyrne.com'
 const canonical = computed(() => `${site}${recipeUrl(recipe.value?.path)}`)
 
 useSeoMeta({
-  title: () => recipe.value?.title ?? '',
+  title: () => displayTitle.value,
   description: () => recipe.value?.description ?? '',
-  ogTitle: () => recipe.value?.title ?? '',
+  ogTitle: () => displayTitle.value,
   ogDescription: () => recipe.value?.description ?? '',
   ogType: 'article',
   ogUrl: () => canonical.value,
@@ -71,7 +91,7 @@ useSeoMeta({
 })
 
 useHead({
-  link: [{ rel: 'canonical', href: canonical }]
+  link: [{ rel: 'canonical', href: () => canonical.value }]
 })
 
 // Recipe structured data is what earns rich results: time, yield and nutrition
@@ -500,32 +520,21 @@ const { data: components } = await useAsyncData(
 
 const variantGroups = computed(() => recipe.value?.variants ?? [])
 
-// Restore the selection a shared link carried: ?infusion=ginger
+// Restore the selection from a query param or a variant path segment, so
+// /sauces/bechamel/soubise/keto opens on that variant.
 watchEffect(() => {
+  const leaf = route.path.split('/').filter(Boolean).at(-1) ?? ''
+
   for (const group of variantGroups.value) {
+    if (chosen.value[group.name]) continue
+
+    // Query params and path segments are slugs, so resolve them back to the
+    // option's own label rather than storing the slug.
     const raw = route.query[queryKey(group.name)]
-    if (raw && !chosen.value[group.name]) chosen.value[group.name] = String(raw)
+    const wanted = raw ? slugify(String(raw)) : slugify(leaf)
+    const match = (group.options ?? []).find(o => slugify(o) === wanted)
+    if (match) chosen.value[group.name] = match
   }
-})
-
-// A diet-style group can qualify the title, so "Keto BBQ Sauce" reads correctly
-// without duplicating the recipe.
-const displayTitle = computed(() => {
-  const base = recipe.value?.title ?? ''
-  const group = variantGroups.value.find(g => g.titlePrefix)
-  if (!group) return base
-  const pick = chosen.value[group.name]
-  if (!pick) return base
-
-  // The canonical title may already carry a diet word; swap it for the choice
-  // rather than stacking a second one in front.
-  const others = (group.options ?? []).filter(o => o !== pick)
-  const carried = others.find(o => new RegExp(`\\b${o}\\b`, 'i').test(base))
-  if (carried) {
-    return base.replace(new RegExp(`\\s*\\b${carried}\\b`, 'i'), pick === 'Standard' ? '' : ` ${pick}`).replace(/\s+/g, ' ').trim()
-  }
-  if (base.toLowerCase().includes(pick.toLowerCase())) return base
-  return pick === 'Standard' ? base : `${pick} ${base}`
 })
 
 // Variant subsections share everything before them; only the chosen one shows.
@@ -905,9 +914,12 @@ const fatPct = computed(() =>
       >
         <span class="text-(--ui-text-dimmed)">{{ group.name }}</span>
         <div class="flex rounded-lg border border-(--ui-border) overflow-hidden">
-          <button
+          <NuxtLink
             v-for="option in variantLabels[group.name] ?? []"
             :key="option"
+            :to="option === group.default
+              ? recipeUrl(recipe?.path)
+              : `${recipeUrl(recipe?.path)}/${slugify(option)}`"
             class="px-2.5 py-1 text-xs font-medium transition-colors"
             :class="chosen[group.name] === option
               ? 'bg-primary-500 text-white'
@@ -915,7 +927,7 @@ const fatPct = computed(() =>
             @click="selectVariant(group.name, option)"
           >
             {{ option.replace(group.match ?? '', '').replace(/^[\s:.\-\d]+/, '') || option }}
-          </button>
+          </NuxtLink>
         </div>
       </div>
 
