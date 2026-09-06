@@ -1,5 +1,7 @@
 ---
 title: Garlic Aioli
+paths:
+  - sauces/condiments
 category: Condiments
 description:
   An aioli is similar to a mayonnaise, but it’s got a big kick and almost spicy

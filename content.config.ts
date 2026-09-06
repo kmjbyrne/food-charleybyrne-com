@@ -2,6 +2,20 @@ import { defineCollection, defineContentConfig, z } from '@nuxt/content'
 
 export default defineContentConfig({
   collections: {
+    techniques: defineCollection({
+      type: 'page',
+      source: 'techniques/**/*.md',
+      schema: z.object({
+        title: z.string(),
+        description: z.string().optional(),
+        category: z.string().optional(),
+        tags: z.array(z.string()).optional(),
+        time: z.number().optional(),
+        difficulty: z.string().optional(),
+        equipment: z.array(z.string()).optional()
+      })
+    }),
+
     recipes: defineCollection({
       type: 'page',
       source: 'recipes/**/*.md',
@@ -26,6 +40,7 @@ export default defineContentConfig({
           .optional(),
         cover: z.string().optional(),
         keto: z.boolean().optional(),
+        paths: z.array(z.string()).optional(),
         diet: z.record(z.boolean()).optional(),
         time: z.number().optional(),
         prep: z.number().optional(),

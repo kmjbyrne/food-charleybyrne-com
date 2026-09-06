@@ -1,5 +1,7 @@
 ---
 title: Express Garlic Aioli
+paths:
+  - sauces/condiments
 category: Condiments
 description:
   Quick and dirty method. This approach doesn't use egg yolks but can be a

@@ -1,5 +1,7 @@
 ---
 title: Keto Seafood Chowder
+paths:
+  - seafood
 description: Creamy seafood chowder made with double cream instead of milk
 category: Seafood
 tags:

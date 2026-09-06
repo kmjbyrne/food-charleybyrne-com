@@ -1,5 +1,7 @@
 ---
 title: Cauliflower Pizza Base
+paths:
+  - bread
 description: Pizza base made from riced cauliflower and parmesan
 category: Pizza
 keto: True

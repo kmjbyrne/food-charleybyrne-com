@@ -1,5 +1,7 @@
 ---
 title: Hollandaise Sauce
+paths:
+  - sauces/cooking
 description:
   Glossy and delectable Hollandaise sauce. One of the five french mother sauces
 category: Sauces

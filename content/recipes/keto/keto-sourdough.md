@@ -1,5 +1,7 @@
 ---
 title: Keto Sourdough
+paths:
+  - bread
 description:
   Almond and coconut flour loaf with the tang of buttermilk and vinegar
 category: Bread

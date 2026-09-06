@@ -1,5 +1,7 @@
 ---
 title: Curry Base
+paths:
+  - keto/curry
 description: Indian curry base for use with a variety of dishes
 category: Indian
 keto: true

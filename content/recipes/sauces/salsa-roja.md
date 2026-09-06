@@ -1,5 +1,8 @@
 ---
 title: Salsa Roja
+paths:
+  - sauces/cooking
+  - keto/sauces
 description:
   Salsa to add a kick to burritos, bowls or just splattered over anything
   really!

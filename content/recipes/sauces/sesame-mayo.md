@@ -1,5 +1,7 @@
 ---
 title: Sesame Mayonnaise
+paths:
+  - sauces/dressings
 description: "Sesame mayonnaise, dressing or dip"
 category: Dressing
 ---

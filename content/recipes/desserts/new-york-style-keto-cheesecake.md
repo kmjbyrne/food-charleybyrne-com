@@ -1,6 +1,10 @@
 ---
-title: New York Style Cheesecake
-description: Vanilla-pecan baked cheesecake, keto or standard
+title: New York Style Keto Cheesecake
+paths:
+  - keto/desserts
+description:
+  Vanilla-pecan baked cheesecake on an almond crust, with a standard sugar and
+  biscuit-base variant
 category: Desserts
 variants:
   - name: Diet
@@ -33,7 +37,8 @@ tags:
 
 ## Ingredients
 
-Choose keto or standard at the top of the page. The filling and method are the same either way; only the crust and the sweetener change.
+Choose keto or standard at the top of the page. The filling and method are the
+same either way; only the crust and the sweetener change.
 
 ### Keto crust: almond and pecan
 

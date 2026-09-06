@@ -1,5 +1,7 @@
 ---
 title: Keto Caramel Sauce
+paths:
+  - desserts
 description: Keto caramel made with a blended sweetener
 category: Desserts
 dietary:

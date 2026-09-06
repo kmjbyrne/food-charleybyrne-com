@@ -1,5 +1,7 @@
 ---
 title: Tuscan Chicken
+paths:
+  - keto
 description: Rich, tuscan chicken
 category: Italian
 dietary:

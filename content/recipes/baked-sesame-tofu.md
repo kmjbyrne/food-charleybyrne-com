@@ -1,5 +1,7 @@
 ---
 title: Baked Sesame Tofu
+paths:
+  - keto
 description: Delicious baked tofu in a mildly sweet sauce
 category: Chinese
 keto: true

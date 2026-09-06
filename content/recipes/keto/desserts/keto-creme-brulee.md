@@ -1,5 +1,7 @@
 ---
 title: Keto Crème Brûlée
+paths:
+  - desserts
 description: A smooth vanilla flavoured crème brûlée, decadent but easy to make.
 category: Desserts
 dietary:

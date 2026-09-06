@@ -1,5 +1,7 @@
 ---
 title: Keto Fries
+paths:
+  - sides
 description: Fries built from almond and coconut flour dough, baked not fried
 category: Sides
 tags:

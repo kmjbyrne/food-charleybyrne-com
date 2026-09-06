@@ -1,5 +1,7 @@
 ---
 title: Express Toasty Bread
+paths:
+  - bread
 description: Single serving almond flour bread, ready in a couple of minutes
 category: Bread
 ---

@@ -1,5 +1,7 @@
 ---
 title: Garlic Parmesan Sauce
+paths:
+  - sauces/cooking
 description: Creamy garlic and parmesan sauce built on a beef stock base
 category: Sauces
 tags:

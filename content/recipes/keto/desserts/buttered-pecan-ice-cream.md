@@ -1,5 +1,7 @@
 ---
 title: Buttered Pecan Ice Cream
+paths:
+  - desserts
 description: Buttered pecan ice cream, kept scoopable without sugar
 category: Desserts
 diet:

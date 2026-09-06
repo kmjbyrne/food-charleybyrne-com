@@ -1,5 +1,7 @@
 ---
 title: Keto Mint Chocolate
+paths:
+  - desserts
 description: Delicious sugar free minty dark chocolate
 category: Desserts
 tags:

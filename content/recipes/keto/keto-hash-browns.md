@@ -1,5 +1,7 @@
 ---
 title: Keto Hash Browns
+paths:
+  - sides
 category: Sides
 diet:
   keto: true

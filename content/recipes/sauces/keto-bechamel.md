@@ -1,5 +1,8 @@
 ---
 title: Keto Bechamel Sauce
+paths:
+  - sauces/cooking
+  - keto/sauces
 category: Sauces
 keto: true
 tags:

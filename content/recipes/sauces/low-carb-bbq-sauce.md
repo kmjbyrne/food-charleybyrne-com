@@ -1,5 +1,8 @@
 ---
-title: BBQ Sauce
+title: Low Carb BBQ Sauce
+paths:
+  - sauces/condiments
+  - keto/sauces
 description:
   Smoky passata-based BBQ sauce with cocoa for depth, sweetened to suit your
   diet
@@ -7,8 +10,8 @@ category: Sauces
 variants:
   - name: Diet
     section: Ingredients
-    options: [Keto, Standard]
-    default: Keto
+    options: [Low Carb, Standard]
+    default: Low Carb
     titlePrefix: true
 tags:
   - bbq
@@ -38,7 +41,7 @@ servings: 12
 - 1 tbsp soy sauce or coconut aminos, optional, for umami
 - 1 to 2 tsp unsweetened cocoa powder
 
-### Keto sweetener
+### Low Carb sweetener
 
 - 1/4 cup allulose or erythritol
 - Pinch of pure stevia

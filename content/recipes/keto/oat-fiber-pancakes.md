@@ -1,5 +1,7 @@
 ---
 title: Oaty Fiber Protein Pancakes
+paths:
+  - desserts
 description: Naturally low-carb but with no loss of taste
 category: Desserts
 dietary:

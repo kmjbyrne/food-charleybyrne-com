@@ -1,5 +1,7 @@
 ---
 title: Simple Bechamel Sauce
+paths:
+  - sauces/cooking
 description: Basic version of one of the simplest mother sauces
 category: Sauces
 tags:

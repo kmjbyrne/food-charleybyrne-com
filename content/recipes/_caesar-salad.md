@@ -1,5 +1,7 @@
 ---
 title: Special Caesar Salad
+paths:
+  - keto
 description: Special Caesar salad recipe including some Mediterranean flavours
 category: Salad
 partial: true

@@ -1,5 +1,7 @@
 ---
 title: Blue Cheese Dip
+paths:
+  - sauces/condiments
 description: Blue cheese dip for wings, carrots and celery
 category: Dips
 ---

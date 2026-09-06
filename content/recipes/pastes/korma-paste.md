@@ -1,5 +1,7 @@
 ---
 title: Korma Curry Paste
+paths:
+  - keto/pastes
 description: A fragrant korma curry base
 category: Indian
 dietary:

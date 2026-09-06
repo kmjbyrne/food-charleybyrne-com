@@ -1,5 +1,7 @@
 ---
 title: BBQ Sauce
+paths:
+  - sauces/condiments
 category: Condiments
 description: Simple BBQ sauce
 tags:

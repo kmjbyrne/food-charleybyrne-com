@@ -1,5 +1,7 @@
 ---
 title: Peanut Butter Energy Bars
+paths:
+  - keto/snacks
 description: Healthy peanut butter based energy bars with seeds and nuts
 category: Snacks
 keto: true

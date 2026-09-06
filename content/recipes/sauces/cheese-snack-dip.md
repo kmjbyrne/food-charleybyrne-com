@@ -1,5 +1,7 @@
 ---
 title: Cheese Snack Dip
+paths:
+  - sauces/condiments
 description: Delicious cheesy dip for nachos, crisps, veggies
 category: Dips
 tags:

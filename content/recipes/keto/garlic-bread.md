@@ -1,5 +1,7 @@
 ---
 title: Keto Garlic Bread
+paths:
+  - sides
 description: Keto garlic bread on an almond flour base
 category: Sides
 diet:

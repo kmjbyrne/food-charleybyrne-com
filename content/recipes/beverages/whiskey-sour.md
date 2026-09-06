@@ -1,5 +1,7 @@
 ---
 title: Whiskey Sour
+paths:
+  - keto/beverages
 description: Fresh and sour cocktail for all occasions
 category: Cocktail
 dietary:

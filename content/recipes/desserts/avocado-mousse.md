@@ -1,5 +1,7 @@
 ---
 title: Avocado Chocolate Mousse
+paths:
+  - keto/desserts
 description: Rich, filling and healthy avocado based chocolate mousse
 category: Desserts
 dietary:
