@@ -632,9 +632,25 @@
   inset: 0;
   z-index: 60;
   overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 2.5rem 1.5rem;
+}
+
+/*
+ * The blur sits on its own fixed layer. On the scrolling element it repaints
+ * the whole viewport every frame.
+ */
+.recipe-card-overlay::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
   background: color-mix(in srgb, var(--ui-bg-inverted) 45%, transparent);
   backdrop-filter: blur(4px);
+}
+
+.recipe-card {
+  contain: layout paint;
 }
 
 .recipe-card {
