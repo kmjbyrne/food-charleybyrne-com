@@ -10,7 +10,7 @@ A slight twist on the classic salad.
 
 ## Ingredients
 
-- 100g cor or romaine lettuce or whichever fresh leafy greens you want
+- 100g cos or romaine lettuce or whichever fresh leafy greens you want
 - Handful of chopped sun dried tomatoes
 - Handful of croutons
 - 30g grated parmesan

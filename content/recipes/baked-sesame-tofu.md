@@ -37,7 +37,7 @@ data:
 4. Meanwhile, add the second soy sauce, sesame oil, rice vinegar, garlic,
    ginger, honey to a pan and cook on medium for 1 or 2 minutes
 5. Add the dried chili flakes
-6. Add the water and thickening agent (xantham or preferred alternative) and
+6. Add the water and thickening agent (xanthan or preferred alternative) and
    stir
 7. When the sauce thickens, remove from heat
 8. When the tofu is finished, add it to the sauce and mix together on low heat

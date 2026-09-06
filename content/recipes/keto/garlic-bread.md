@@ -1,13 +1,10 @@
 ---
 title: Keto Garlic Bread
+description: Keto garlic bread on an almond flour base
 category: Sides
 diet:
   keto: True
 ---
-
-Try to draw out as much moisture from fresh mozzarella if you prefer to avoid
-the store-bought grated variety, which can have added starch to stop cheese from
-clumping together.
 
 ## Ingredients
 
@@ -33,3 +30,13 @@ clumping together.
 1. Preheat oven to 200°C
 2. ...
 3. Bake for 15 minutes or until golden
+
+## Notes
+
+Draw out as much moisture as you can from fresh mozzarella if you want to avoid
+the store-bought grated kind, which often has added starch to stop the cheese
+clumping.
+
+Draw out as much moisture as you can from fresh mozzarella if you want to avoid
+the store-bought grated kind, which often has added starch to stop the cheese
+clumping.

@@ -1,5 +1,5 @@
 ---
-title: Low Card Quick Bread
+title: Low Carb Quick Bread
 category: Bread
 ---
 

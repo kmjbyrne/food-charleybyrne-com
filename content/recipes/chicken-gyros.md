@@ -1,5 +1,5 @@
 ---
-title: Baked Chicken Gryos
+title: Baked Chicken Gyros
 description: Greek chicken gyros made with yoghurt, garlic, lemon and spices
 category: Chicken
 tags:

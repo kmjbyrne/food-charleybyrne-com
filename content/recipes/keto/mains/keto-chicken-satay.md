@@ -1,5 +1,6 @@
 ---
 title: Keto Chicken Satay
+description: Marinaded chicken skewers with a peanut satay sauce
 category: Asian
 tags:
   - keto

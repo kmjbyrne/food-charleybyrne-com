@@ -1,5 +1,6 @@
 ---
 title: Quick Peanut Sauce
+description: Peanut satay sauce for one, stirred together in a bowl
 category: Chinese
 tags:
   - quick

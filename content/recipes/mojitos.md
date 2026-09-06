@@ -1,5 +1,6 @@
 ---
 title: Easy Mojito
+description: Rum, lime and mint over crushed ice, topped with soda
 category: Beverages
 ---
 

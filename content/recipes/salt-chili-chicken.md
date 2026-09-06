@@ -1,5 +1,6 @@
 ---
 title: Salt Chili Chicken
+description: Crisp five-spice chicken tossed with onion and peppers
 category: Chinese
 ---
 

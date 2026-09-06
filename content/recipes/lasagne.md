@@ -1,5 +1,5 @@
 ---
-title: Lasange al Forno
+title: Lasagne al Forno
 description: Needs no explanation!
 category: Italian
 cover: /lasagne.jpg
@@ -11,7 +11,7 @@ tags:
 
 ## Equipment
 
-- Lasange size baking dish
+- Lasagne size baking dish
 - 3 saucepans (1 large)
 - Hunger but patience
 

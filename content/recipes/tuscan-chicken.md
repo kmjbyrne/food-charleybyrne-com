@@ -20,7 +20,7 @@ tags:
 
 ## Ingredients
 
-- 1/4 tsp xantham gum
+- 1/4 tsp xanthan gum
 - 2 tbsp olive oil
 - 4 breasts of chicken
 - 2 tsp oregano

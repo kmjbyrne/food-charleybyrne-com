@@ -1,5 +1,6 @@
 ---
 title: Garlic Parmesan Sauce
+description: Creamy garlic and parmesan sauce built on a beef stock base
 category: Sauces
 tags:
   - garlic
@@ -10,7 +11,7 @@ tags:
 
 - 1/4 (60ml) cup butter
 - 5 minced garlic cloves
-- 2 tbsp flour OR 1/3 tsp xantham gum
+- 2 tbsp flour OR 1/3 tsp xanthan gum
 - 1 cup (280ml) beef stock
 - 1 tsp basil
 - 1 tsp oregano

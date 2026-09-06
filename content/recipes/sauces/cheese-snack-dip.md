@@ -24,6 +24,6 @@ tags:
 3. Whisk into the milk and wait until it comes to a simmer
 4. The ideal state here is the mixture sticking to your cooking utensil without
    immediately slipping off
-5. Mix in the cheddar cheese, bit by by
+5. Mix in the cheddar cheese, bit by bit
 6. Lower the heat, melt all together but don't overcook the cheese
 7. Once the cheese is melted down, mix the remaining ingredients

@@ -1,5 +1,6 @@
 ---
 title: Keto English Muffin
+description: Almond flour muffin made in a mug, split and toasted
 category: Bread
 tags:
   - keto

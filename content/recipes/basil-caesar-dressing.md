@@ -1,5 +1,6 @@
 ---
 title: Basil Caesar Dressing
+description: Caesar dressing with basil, blitzed in one go with no anchovies
 coverImage: stars.jpg
 category: Dressing
 ---

@@ -1,5 +1,6 @@
 ---
 title: Rogan Josh
+description: Chicken in a deep spiced tomato sauce, heavy on the paprika
 category: Indian
 tags:
   - chicken

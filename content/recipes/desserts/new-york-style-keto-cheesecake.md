@@ -22,7 +22,9 @@ tags:
 
 ## Ingredients
 
-### Crust, variant A: almond and pecan
+Pick one of the two crusts below. You do not need both.
+
+### Crust option 1: almond and pecan
 
 - 95g almond flour
 - 40g pecans, finely crushed
@@ -30,9 +32,9 @@ tags:
 - 1 1/2 tbsp powdered erythritol
 - Tiny pinch of stevia
 - Pinch of salt
-- Lemon zest
+- Lemon zest, or 1 tbsp lemon juice
 
-### Crust, variant B: coconut and pecan
+### Crust option 2: coconut and pecan
 
 - 45g coconut flour
 - 40g pecans, finely crushed
@@ -40,11 +42,13 @@ tags:
 - 1 1/2 tbsp powdered erythritol
 - Tiny pinch of stevia
 - Pinch of salt
-- Lemon zest
+- Lemon zest, or 1 tbsp lemon juice
 
 ### Filling
 
-- 900g full-fat cream cheese, at room temperature
+- ~900g full-fat cream cheese, at room temperature (3 packs of 275g is close
+  enough, this is not a precise measure)
+- 1 pack (250g) mascarpone
 - 150g sour cream, or 150ml double cream for a looser, silkier set
 - 3 large eggs (~165g)
 - 1 1/2 tbsp (~11g) coconut flour
@@ -60,7 +64,7 @@ tags:
    Gritty sweetener does not dissolve in the filling.
 2. Heat the fan oven to 155°C.
 3. Mix your chosen crust ingredients until the texture of wet sand. If using the
-   coconut variant, rest it 2 minutes so the flour absorbs the butter.
+   coconut option, rest it 2 minutes so the flour absorbs the butter.
 4. Press firmly into the base of the springform pan with the flat bottom of a
    glass.
 5. Bake 10-12 minutes for almond, 8-10 minutes for coconut, until lightly
@@ -70,7 +74,8 @@ tags:
    door straight away to trap the steam.
 7. Beat the cream cheese and the powdered sweetener blend on low for 2 minutes
    until smooth.
-8. Mix in the coconut flour, sour cream and vanilla, just until combined.
+8. Mix in the coconut flour, mascarpone, sour cream and vanilla, just until
+   combined.
 9. Add the eggs one at a time on low speed, stopping as each disappears. Stir in
    the lemon juice for 5-10 seconds at the very end. Do not over-mix or you will
    trap air.

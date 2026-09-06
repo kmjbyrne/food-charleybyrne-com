@@ -1,5 +1,6 @@
 ---
 title: Keto Buns
+description: Yeasted almond flour buns that rise and brown like the real thing
 category: Bread
 ---
 

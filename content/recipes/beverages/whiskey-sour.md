@@ -29,7 +29,7 @@ data:
 
 1. Fill a shaker with whiskey of choice, lemon juice, simple syrup, egg white
 2. Once egg whites are frothy, add ice, shake again until shaker is chilled
-  through
+   through
 3. Strain into a chilled rocks glass
 4. Blot 3 drops of bitters and create pattern with toothpick
 5. Garnish with a dried lemon/lime/orange slice

@@ -1,14 +1,10 @@
 ---
 title: Buttered Pecan Ice Cream
+description: Buttered pecan ice cream, kept scoopable without sugar
 category: Desserts
 diet:
   keto: True
 ---
-
-Currently experimenting with using 1 tbsp collagen protein OR 2 tbsp vodka OR
-some xantham gum as a stabilizer to mitigate the risk of the mass becoming rock
-solid and inedible without a pick axe. The other approach to handle this is
-simply waiting longer for thaw (but that's boring).
 
 ## Ingredients
 
@@ -19,3 +15,13 @@ simply waiting longer for thaw (but that's boring).
 - 8oz (240ml) double cream
 - 1/2 tsp vanilla essence
 - 3 tbsp powdered sweetener
+
+## Notes
+
+Still experimenting with the stabiliser: 1 tbsp collagen protein, 2 tbsp vodka,
+or a little xanthan gum. Without one the mass sets rock solid and needs a pick
+axe. The other fix is simply waiting longer for it to thaw, but that is boring.
+
+Still experimenting with the stabiliser: 1 tbsp collagen protein, 2 tbsp vodka,
+or a little xanthan gum. Without one the mass sets rock solid and needs a pick
+axe. The other fix is simply waiting longer for it to thaw, but that is boring.

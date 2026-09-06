@@ -1,5 +1,6 @@
 ---
 title: Low Carb BBQ Sauce
+description: Smoky BBQ sauce sweetened without sugar
 category: Sauces
 ---
 

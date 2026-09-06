@@ -1,5 +1,6 @@
 ---
 title: Poached Salmon
+description: Salmon poached gently in white wine with shallot and dill
 category: Fish
 ---
 
@@ -24,7 +25,7 @@ Sprinkle the salmon fillets with a little salt. Place salmon fillets, skin-side
 down on the pan, and cover.
 
 Cook 5 to 10 minutes, depending on the thickness of the fillet, or to desired
-done-ness. Do not overcook.
+doneness. Do not overcook.
 
 Serve sprinkled with freshly ground black pepper and a slice or two of lemon on
 the side.

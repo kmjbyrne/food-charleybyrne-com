@@ -1,5 +1,6 @@
 ---
 title: Keto Nutty Mousse
+description: Four ingredient mousse of cream, mascarpone and nut butter
 category: Desserts
 diet:
   keto: true

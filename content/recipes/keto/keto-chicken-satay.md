@@ -1,10 +1,11 @@
 ---
 title: Keto Chicken Satay
+description: Marinaded chicken skewers with a peanut satay sauce
 category: Asian
-tags: 
- - keto
- - asian
- - chicken
+tags:
+  - keto
+  - asian
+  - chicken
 keto: True
 ---
 
@@ -32,6 +33,6 @@ keto: True
 - 2 tbsp soy sauce
 - 1 tbsp fish sauce
 - 1 tbsp lime juice
-- 60ml (1/4 cup) water 
+- 60ml (1/4 cup) water
 
 Garnish with chopped spring onions and slice chilis

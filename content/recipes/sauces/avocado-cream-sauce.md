@@ -1,5 +1,6 @@
 ---
 title: Avocado Cream Sauce
+description: Avocado blended with yoghurt, lime and garlic
 category: Sauces
 diet:
   keto: true

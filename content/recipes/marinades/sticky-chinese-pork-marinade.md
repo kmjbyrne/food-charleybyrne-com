@@ -1,5 +1,6 @@
 ---
 title: Sticky Chinese Pork Marinade
+description: Five-spice, honey and soy marinade that caramelises on pork
 category: Sauces
 ---
 

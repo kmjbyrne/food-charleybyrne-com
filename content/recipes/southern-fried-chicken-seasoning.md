@@ -1,7 +1,7 @@
 ---
 title: Southern Fried Chicken Seasoning (Keto)
 category: Seasoning
-description: Low card seasoning for delicious KFC style chicken
+description: Low carb seasoning for delicious KFC style chicken
 ---
 
 ## Ingredients

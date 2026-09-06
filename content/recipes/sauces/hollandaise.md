@@ -1,11 +1,11 @@
 ---
-title: Hollaindaise Sauce
+title: Hollandaise Sauce
 description:
-  Glossy and delectable Hollaindaise sauce. One of the five french mother sauces
+  Glossy and delectable Hollandaise sauce. One of the five french mother sauces
 category: Sauces
 # image: ADD
 tags:
-  - hollaindaise
+  - hollandaise
   - french
   - egg
 ---
@@ -13,11 +13,11 @@ tags:
 Pairs exceptionally well with steak and is one of the primary components in eggs
 benedict.
 
-A little patience is required for a traditionally made Hollaindaise due to the
+A little patience is required for a traditionally made Hollandaise due to the
 emulsification process. Too hot, the eggs will scramble but also requires a
 liberal amount of whisking.
 
-## Equipments
+## Equipment
 
 - Water bath (bowl over but not touching a saucepan of simmering water)
 - Whisk

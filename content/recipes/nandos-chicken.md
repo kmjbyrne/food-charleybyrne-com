@@ -1,5 +1,7 @@
 ---
 title: Nandos Chicken
+description:
+  Whole chicken in a blended peri peri marinade of pepper, chili and lemon
 category: Chicken
 tags:
   - chicken

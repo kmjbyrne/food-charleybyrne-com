@@ -1,5 +1,6 @@
 ---
 title: Tandoori Chicken Marinade
+description: Yoghurt and garam masala marinade for chicken, best left overnight
 category: Indian
 ---
 

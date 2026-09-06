@@ -1,5 +1,6 @@
 ---
 title: Espresso Martini
+description: Vodka, Kahlua and fresh espresso, shaken until ice cold
 category: Cocktail
 tags:
   - espresso

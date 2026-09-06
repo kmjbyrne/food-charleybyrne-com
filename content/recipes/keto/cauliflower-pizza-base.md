@@ -1,5 +1,6 @@
 ---
 title: Cauliflower Pizza Base
+description: Pizza base made from riced cauliflower and parmesan
 category: Pizza
 keto: True
 tags:

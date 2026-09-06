@@ -13,7 +13,7 @@ category: Bread
 - 3/4 (83g) cup flaxseed meal
 - 1/4 (15g) cup whey isolate
 - 2 tbsp ground psyllium husk
-- 2 tsp xantham gum
+- 2 tsp xanthan gum
 - 2 tbsp baking powder
 - 1 tsp sea salt
 - 1/4 tsp cream of tartar

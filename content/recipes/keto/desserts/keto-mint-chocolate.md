@@ -11,7 +11,7 @@ keto: true
 
 ## Ingredients
 
-- 125g cocao butter
+- 125g cacao butter
 - 8 tbsp cocoa powder
 - 5 tbsp powdered sweetener (erythritol, xylitol)
 - 5 drops of mint essence
@@ -19,7 +19,7 @@ keto: true
 ## Method
 
 1. Bath a bowl in a pot of water, bring to boil
-2. Tip in cocao butter, stir until melted
+2. Tip in cacao butter, stir until melted
 3. Tip in cocoa powder and mix until well combined and smooth
 4. Turn off heat, tip in sweetener and mix until well combined
 5. At the end, drop the mint essence and give it a final stir

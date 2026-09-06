@@ -36,7 +36,7 @@ Pairs great with burritos, mex-bowls or just from a bowl with a fork :)
 6. Then, add the rice, stirring well to coat the rice evenly
 7. Then, add the stock, add the seasonings
 8. Cook on lowest heat for around 15-20 minutes
-9. The rice should have absorded the liquids evenly
+9. The rice should have absorbed the liquids evenly
 10. Remove from heat, put a tea towel between the pot and lid
 11. Let stand for a couple of minutes
 12. Optionally garnish with fresh or dried coriander leaf

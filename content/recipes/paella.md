@@ -1,5 +1,6 @@
 ---
 title: Simple Paella
+description: Saffron rice with chicken and chorizo, cooked in one pan
 category: Mains
 tags:
   - spanish
@@ -36,7 +37,7 @@ tags:
 4. Pour another 1tbsp of oil into the pan, add the chicken and fry until meat is
    cooked through
 5. Set aside in a bowl
-6. Pour another 1tbsp oil oil into the pan, add onion and garlic and cook for 4
+6. Pour another 1tbsp oil into the pan, add onion and garlic and cook for 4
    minutes
 7. Add in the pepper, paprika, thyme, cook for 2 minutes
 8. With high heat, stir in the rice, coating in the oil, then pour over stock

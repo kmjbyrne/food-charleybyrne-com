@@ -1,5 +1,7 @@
 ---
 title: Keto Sourdough
+description:
+  Almond and coconut flour loaf with the tang of buttermilk and vinegar
 category: Bread
 tags:
   - bread
@@ -13,7 +15,7 @@ tags:
 - 1/3 cup coconut flour
 - 1/4 cup flaxseed powder
 - 1 tsp baking powder
-- 1 tsp tsp sea salt
+- 1 tsp sea salt
 - 4 large egg whites
 - 1 egg
 - 1/2 cup buttermilk
