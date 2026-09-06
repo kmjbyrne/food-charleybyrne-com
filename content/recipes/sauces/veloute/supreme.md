@@ -16,8 +16,9 @@ servings: 6
 difficulty: Medium
 ---
 
-Chicken velouté reduced with mushroom trimmings, then finished with cream and
-butter. Pale, glossy and rich. The classic partner to poached chicken.
+Chicken velouté simmered with mushroom trimmings, then finished with cream and
+butter. It comes out pale, glossy and rich. Traditionally served with poached
+chicken.
 
 ## Ingredients
 
@@ -40,5 +41,5 @@ butter. Pale, glossy and rich. The classic partner to poached chicken.
 
 ## Notes
 
-- The butter goes in off the heat and cold. Hot butter will not emulsify and the
-  sauce turns oily.
+- Add the butter cold and off the heat. Warm butter will not emulsify and the
+  sauce goes oily.

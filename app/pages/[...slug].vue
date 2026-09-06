@@ -5,9 +5,19 @@ const path = computed(() => `/${segments.value.join('/')}`)
 
 // One namespace holds both, so a path is a recipe if a document sits there and
 // a category otherwise.
+// Every recipe answers to its full path and to a short one: /soubise as well as
+// /sauces/bechamel/soubise. The full path stays canonical.
 const { data: recipe } = await useAsyncData(
   () => `entry-${path.value}`,
-  () => queryCollection('recipes').path(`/recipes${path.value}`).first()
+  async () => {
+    const exact = await queryCollection('recipes').path(`/recipes${path.value}`).first()
+    if (exact) return exact
+
+    if (segments.value.length !== 1) return null
+    const wanted = segments.value[0]!
+    const all = await queryCollection('recipes').all()
+    return all.find(r => (r.slug ?? (r.path ?? '').split('/').pop()) === wanted) ?? null
+  }
 )
 
 const entry = computed(() => recipe.value ?? null)

@@ -25,6 +25,12 @@ const { data: related } = await useAsyncData(() => `related-${slug.value}`, () =
 
 // Structured data must render server-side, so it reads the parsed body rather
 // than the DOM.
+const flattenText = (node: unknown): string => {
+  if (typeof node === 'string') return node
+  if (!Array.isArray(node)) return ''
+  return node.slice(2).map(flattenText).join('')
+}
+
 const flatten = (node: unknown): string => {
   if (typeof node === 'string') return node
   if (!Array.isArray(node)) return ''
@@ -400,12 +406,84 @@ const copyRecipe = async () => {
 // A mother sauce lists what derives from it, pulled from the sibling files.
 const { data: derivatives } = await useAsyncData(
   () => `derivatives-${slug.value}`,
-  () => (recipe.value?.motherSauce
-    ? queryCollection('recipes')
-        .where('path', 'LIKE', `${slug.value}/%`)
-        .select('path', 'title', 'description')
-        .all()
-    : Promise.resolve([])),
+  async () => {
+    if (!recipe.value?.motherSauce || !slug.value) return []
+    const all = await queryCollection('recipes')
+      .select('path', 'title', 'description')
+      .all()
+    return all.filter(r => (r.path ?? '').startsWith(`${slug.value}/`))
+  },
+  { watch: [slug] }
+)
+
+// The path is the real hierarchy, so the trail walks it rather than the flat
+// category field.
+const trail = computed(() => {
+  const segs = recipeUrl(recipe.value?.path).split('/').filter(Boolean).slice(0, -1)
+  const out: { label: string, to: string }[] = []
+  const acc: string[] = []
+  for (const seg of segs) {
+    acc.push(seg)
+    out.push({
+      label: seg.split('-').map(w => w[0]!.toUpperCase() + w.slice(1)).join(' '),
+      to: `/${acc.join('/')}`
+    })
+  }
+  return out
+})
+
+// A daughter sauce points back up to the mother it derives from.
+const { data: parents } = await useAsyncData(
+  () => `parents-${slug.value}`,
+  async () => {
+    const refs = recipe.value?.links ?? []
+    if (!refs.length) return []
+    const all = await queryCollection('recipes')
+      .select('path', 'title', 'motherSauce')
+      .all()
+    return all.filter(r => refs.includes(r.path ?? ''))
+  },
+  { watch: [slug] }
+)
+
+const motherOf = computed(() => parents.value?.find(p => p.motherSauce) ?? null)
+
+// A derivative can pull its base ingredients from the recipe it inherits, so
+// changing the mother updates every daughter.
+const { data: inherited } = await useAsyncData(
+  () => `inherits-${slug.value}`,
+  async () => {
+    const from = recipe.value?.inherits
+    if (!from) return null
+    const base = await queryCollection('recipes').path(from).first()
+    if (!base) return null
+
+    const want = (recipe.value?.inheritsSection ?? 'Ingredients').toLowerCase()
+    const items: string[] = []
+    let capture = false
+
+    const walk = (node: unknown) => {
+      if (!Array.isArray(node)) return
+      const [tag, , ...kids] = node as [string, unknown, ...unknown[]]
+      if (/^h[23]$/.test(tag)) {
+        capture = flattenText(node).trim().toLowerCase() === want
+        return
+      }
+      if (capture && tag === 'ul') {
+        for (const li of kids) {
+          if (Array.isArray(li) && li[0] === 'li') {
+            const text = flattenText(li).replace(/\s+/g, ' ').trim()
+            if (text) items.push(text)
+          }
+        }
+        return
+      }
+      kids.forEach(walk)
+    }
+
+    ;((base.body as { value?: unknown[] })?.value ?? []).forEach(walk)
+    return { title: base.title, path: base.path, items }
+  },
   { watch: [slug] }
 )
 
@@ -698,23 +776,42 @@ const fatPct = computed(() =>
 <template>
   <div class="px-6 py-8 flex justify-center gap-8">
     <article class="w-full max-w-[760px] flex flex-col gap-6">
-      <div class="flex items-center gap-2 text-sm text-(--ui-text-muted)">
+      <nav class="flex items-center gap-2 text-sm text-(--ui-text-muted) flex-wrap">
         <NuxtLink
           to="/"
           class="hover:text-primary-500 transition-colors"
         >Recipes</NuxtLink>
+        <template
+          v-for="crumb in trail"
+          :key="crumb.to"
+        >
+          <UIcon
+            name="i-lucide-chevron-right"
+            class="size-3.5 shrink-0"
+          />
+          <NuxtLink
+            :to="crumb.to"
+            class="hover:text-primary-500 transition-colors"
+          >{{ crumb.label }}</NuxtLink>
+        </template>
+        <template v-if="!trail.length && recipe?.category">
+          <UIcon
+            name="i-lucide-chevron-right"
+            class="size-3.5 shrink-0"
+          />
+          <button
+            class="hover:text-primary-500 transition-colors"
+            @click="goToCategory(recipe!.category!)"
+          >
+            {{ recipe.category }}
+          </button>
+        </template>
         <UIcon
           name="i-lucide-chevron-right"
-          class="size-3.5"
+          class="size-3.5 shrink-0"
         />
-        <button
-          v-if="recipe?.category"
-          class="text-(--ui-text) hover:text-primary-500 transition-colors"
-          @click="goToCategory(recipe!.category!)"
-        >
-          {{ recipe.category }}
-        </button>
-      </div>
+        <span class="text-(--ui-text) font-medium">{{ displayTitle }}</span>
+      </nav>
 
       <div
         v-if="heroArt"
@@ -845,6 +942,24 @@ const fatPct = computed(() =>
       />
 
       <div
+        v-if="motherOf"
+        class="flex items-center gap-2.5 p-3 rounded-lg border border-(--ui-border) bg-(--ui-bg-muted) text-[13px]"
+      >
+        <UIcon
+          name="i-lucide-corner-left-up"
+          class="size-4 shrink-0 text-(--ui-text-dimmed)"
+        />
+        <span class="text-(--ui-text-muted)">
+          Derives from
+          <NuxtLink
+            :to="recipeUrl(motherOf.path)"
+            class="font-medium text-primary-500 hover:underline"
+          >{{ motherOf.title }}</NuxtLink>,
+          one of the five French mother sauces.
+        </span>
+      </div>
+
+      <div
         v-if="recipe?.motherSauce"
         class="flex items-start gap-3 p-3.5 rounded-lg border border-primary-500/25 bg-primary-500/8"
       >
@@ -873,6 +988,33 @@ const fatPct = computed(() =>
             </NuxtLink>
           </div>
         </div>
+      </div>
+
+      <div
+        v-if="inherited?.items.length"
+        class="rounded-lg border border-(--ui-border) bg-(--ui-bg-muted) overflow-hidden"
+      >
+        <p class="px-3.5 py-2 text-[11px] font-semibold uppercase tracking-widest text-(--ui-text-dimmed) border-b border-(--ui-border) flex items-center gap-1.5">
+          <UIcon
+            name="i-lucide-link"
+            class="size-3"
+          />
+          From
+          <NuxtLink
+            :to="recipeUrl(inherited.path)"
+            class="normal-case tracking-normal font-medium text-primary-500 hover:underline"
+          >{{ inherited.title }}</NuxtLink>
+        </p>
+        <ul class="px-3.5 py-2.5 flex flex-col gap-1">
+          <li
+            v-for="item in inherited.items"
+            :key="item"
+            class="text-[13px] text-(--ui-text-muted) flex items-start gap-2"
+          >
+            <span class="mt-1.5 size-1 rounded-full bg-(--ui-border-accented) shrink-0" />
+            {{ item }}
+          </li>
+        </ul>
       </div>
 
       <div

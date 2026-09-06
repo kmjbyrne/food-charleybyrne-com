@@ -31,14 +31,14 @@ const isExpanded = computed(() => open.value[props.node.path] ?? isAncestor.valu
           : hasChildren
             ? 'text-(--ui-text) hover:bg-(--ui-bg-elevated)'
             : 'text-(--ui-text-muted) hover:bg-(--ui-bg-elevated) hover:text-(--ui-text)',
-        hasChildren && !isActive ? 'font-semibold' : '',
-        depth ? 'pl-7' : 'pl-2.5'
+        hasChildren && !isActive ? 'font-semibold' : ''
       ]"
+      :style="{ paddingLeft: `${0.625 + depth * 1.1}rem` }"
     >
       <UIcon
-        :name="node.icon"
+        :name="node.recipe ? 'i-lucide-file-text' : node.icon"
         class="size-4 shrink-0"
-        :class="depth ? 'opacity-60' : ''"
+        :class="[depth ? 'opacity-60' : '', node.recipe ? 'opacity-45' : '']"
       />
       <span class="flex-1 text-left truncate">{{ node.label }}</span>
       <button
@@ -54,6 +54,7 @@ const isExpanded = computed(() => open.value[props.node.path] ?? isAncestor.valu
         />
       </button>
       <span
+        v-if="!node.recipe"
         class="text-xs font-medium px-1.5 py-0.5 rounded-full"
         :class="isActive ? 'bg-(--ui-bg) text-primary-500' : 'bg-(--ui-bg-elevated) text-(--ui-text-dimmed)'"
       >{{ node.count }}</span>

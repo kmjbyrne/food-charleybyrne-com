@@ -75,7 +75,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
         <span
           class="size-7 grid place-items-center bg-primary-500 text-white rounded-lg text-sm"
         >
-          <UIcon name="i-lucide-cooking-pot" />
+          <CookingPotMark class="text-base" />
         </span>
         <span class="hidden sm:inline text-base">Recipes</span>
       </NuxtLink>

@@ -51,7 +51,11 @@ export const useRecipeFilters = () => {
 export const inCategory = (r: RecipeMeta, path: string) => {
   const needle = path.toLowerCase()
   if ((r.path ?? '').toLowerCase().startsWith(`/recipes/${needle}/`)) return true
-  return (r.paths ?? []).some(p => `${p.toLowerCase()}/`.startsWith(`${needle}/`))
+  const facets = [
+    ...(r.paths ?? []),
+    ...(r.variants ?? []).flatMap(g => Object.values(g.optionPaths ?? {}))
+  ]
+  return facets.some(p => `${p.toLowerCase()}/`.startsWith(`${needle}/`))
 }
 
 export const useRecipeList = () => {

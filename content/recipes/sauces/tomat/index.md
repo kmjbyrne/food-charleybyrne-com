@@ -43,9 +43,9 @@ and mirepoix, includes stock, and is traditionally thickened with a light roux.
 
 ## Notes
 
-- The sugar is correcting acidity, not sweetening. Taste before adding it, since
-  ripe summer tomatoes rarely need it.
-- Passing it is what separates this from a chunky sauce. It should be smooth.
+- The sugar corrects acidity. Taste before you add it, since ripe summer
+  tomatoes rarely need any.
+- Pass it through a sieve or a food mill. The finished sauce should be smooth.
 
 ## Derivatives
 

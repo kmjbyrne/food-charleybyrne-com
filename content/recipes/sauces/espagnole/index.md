@@ -17,9 +17,9 @@ servings: 8
 difficulty: Hard
 ---
 
-Espagnole is the long one. A brown roux, a mirepoix cooked until it is properly
-coloured, and hours of reduction. Reduce it again with more stock and you have
-demi-glace.
+Espagnole takes the longest of the five. You need a brown roux, a properly
+coloured mirepoix and a few hours of reduction. Reduce it again with more stock
+and it becomes demi-glace.
 
 ## Ingredients
 
@@ -49,8 +49,8 @@ demi-glace.
 ## Notes
 
 - Brown roux thickens less than blond for the same weight, because the starch
-  breaks down as it colours. That is expected, not a fault.
-- Skimming is what keeps it clear. Fat and scum left in turn it muddy.
+  breaks down as it colours. Use a bit more of it, or reduce the sauce longer.
+- Skim often. Fat and scum left in the pan will turn the sauce muddy.
 
 ## Derivatives
 

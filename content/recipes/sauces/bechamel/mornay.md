@@ -16,8 +16,8 @@ servings: 6
 difficulty: Easy
 ---
 
-Bechamel plus cheese and a little egg yolk. The base for croque monsieur,
-gratins and anything that wants to brown under a grill.
+Bechamel with cheese and a little egg yolk stirred through. Use it for croque
+monsieur, gratins and anything you want to brown under a grill.
 
 ## Ingredients
 
@@ -39,7 +39,7 @@ gratins and anything that wants to brown under a grill.
 
 ## Notes
 
-- Boiling after the cheese goes in splits it. The proteins tighten and the fat
+- Do not boil it once the cheese is in. The proteins tighten and the fat
   separates out.
 - Gruyere melts smooth, parmesan brings salt and savour. Cheddar works but goes
   greasier.

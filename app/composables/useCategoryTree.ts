@@ -7,6 +7,7 @@ export interface CategoryNode {
   icon: string
   count: number
   children: CategoryNode[]
+  recipe?: boolean
 }
 
 const ICONS: Record<string, string> = {
@@ -63,7 +64,15 @@ export const useCategoryTree = (
       const isIndex = segs.some((_, i) => i < segs.length - 1
         && indexPaths.has(segs.slice(0, i + 1).join('/')))
       const own = segs.slice(0, -1)
-      const extra = (recipe.paths ?? []).map(p => p.split('/').filter(Boolean))
+      // A recipe with a keto variant belongs under keto too, even though the
+      // base recipe is not itself keto.
+      const fromVariants = (recipe.variants ?? [])
+        .flatMap(g => Object.values(g.optionPaths ?? {}))
+        .map(p => p.split('/').filter(Boolean))
+      const extra = [
+        ...(recipe.paths ?? []).map(p => p.split('/').filter(Boolean)),
+        ...fromVariants
+      ]
       const all = [own, ...extra].filter(p => p.length)
       return isIndex || all.length ? all : []
     }
@@ -75,6 +84,14 @@ export const useCategoryTree = (
         || recipes.value.some(other => (other.path ?? '').startsWith(`/recipes/${key}/`))
       const spots = placements(recipe)
       if (ownsDir) spots.unshift(key.split('/').filter(Boolean))
+
+      // Inside a directory that has its own index.md, siblings become leaves of
+      // that node so Bechamel expands to Mornay and Soubise.
+      const parentKey = key.split('/').slice(0, -1).join('/')
+      if (!ownsDir && parentKey && indexPaths.has(parentKey)) {
+        spots.length = 0
+        spots.push(key.split('/').filter(Boolean))
+      }
 
       for (const segments of spots) {
         let siblings = roots
@@ -90,7 +107,8 @@ export const useCategoryTree = (
               label: toLabel(slug),
               icon: ICONS[slug] ?? 'i-lucide-folder',
               count: 0,
-              children: []
+              children: [],
+              recipe: trail.join('/') === key
             }
             siblings.push(node)
           }

@@ -15,6 +15,7 @@ export interface RecipeVariantGroup {
   section: string
   match?: string
   options?: string[]
+  optionPaths?: Record<string, string>
   scopeBy?: string
   titlePrefix?: boolean
   default?: string
@@ -35,6 +36,9 @@ export interface RecipeMeta {
   paths?: string[]
   links?: string[]
   index?: boolean
+  slug?: string
+  inherits?: string
+  inheritsSection?: string
   motherSauce?: boolean
   time?: number
   prep?: number

@@ -40,5 +40,5 @@ with poached marrow. The traditional sauce for a grilled steak.
 
 ## Notes
 
-- Marrow is traditional and worth it, but the sauce works without. Add a little
-  more butter at the end if you skip it.
+- Marrow is traditional, but the sauce works without it. Add a little more
+  butter at the end if you leave it out.

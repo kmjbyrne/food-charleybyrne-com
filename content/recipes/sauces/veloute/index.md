@@ -17,9 +17,9 @@ servings: 8
 difficulty: Medium
 ---
 
-Velouté is stock plus roux, nothing more. The character comes entirely from the
-stock, so a weak one gives you thickened water. It is the base for suprême,
-allemande and a great many pan sauces.
+Velouté is just stock and roux. All the flavour comes from the stock, so a weak
+one gives you thickened water. It is the base for suprême, allemande and a lot
+of pan sauces.
 
 ## Ingredients
 
@@ -40,9 +40,9 @@ allemande and a great many pan sauces.
 
 ## Notes
 
-- White pepper, not black. Black specks in a pale sauce look like a mistake.
-- The roux and the stock should never both be hot. One warm, one cool is the
-  reliable rule.
+- Use white pepper. Black specks show up badly in a pale sauce.
+- Do not add hot stock to a hot roux. Keep one of them cool and it will not go
+  lumpy.
 
 ## Derivatives
 

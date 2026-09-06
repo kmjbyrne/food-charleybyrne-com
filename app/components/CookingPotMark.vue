@@ -1,0 +1,103 @@
+<script setup lang="ts">
+// The lid is its own path so it can lift and tilt; the steam only rises when
+// the pot is open.
+const open = ref(false)
+</script>
+
+<template>
+  <span
+    class="pot"
+    :class="{ 'is-open': open }"
+    @mouseenter="open = true"
+    @mouseleave="open = false"
+  >
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <g class="pot-steam">
+        <path d="M8 3.5c0-1 1-1 1-2" />
+        <path d="M12 3c0-1 1-1 1-2" />
+        <path d="M16 3.5c0-1 1-1 1-2" />
+      </g>
+      <g class="pot-lid">
+        <path d="M3 9h18" />
+      </g>
+      <path d="M5 9v6a5 5 0 0 0 5 5h4a5 5 0 0 0 5-5V9" />
+      <path d="M2 11h1M21 11h1" />
+    </svg>
+  </span>
+</template>
+
+<style scoped>
+.pot {
+  display: inline-grid;
+  place-items: center;
+  width: 1em;
+  height: 1em;
+}
+
+.pot svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.pot-lid {
+  transform-origin: 50% 45%;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.pot.is-open .pot-lid {
+  transform: translateY(-2.5px) rotate(-11deg);
+}
+
+.pot-steam path {
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.pot.is-open .pot-steam path {
+  animation: pot-steam 1.6s ease-in-out infinite;
+}
+
+.pot.is-open .pot-steam path:nth-child(2) {
+  animation-delay: 0.25s;
+}
+
+.pot.is-open .pot-steam path:nth-child(3) {
+  animation-delay: 0.5s;
+}
+
+@keyframes pot-steam {
+  0% {
+    opacity: 0;
+    transform: translateY(1.5px);
+  }
+  40% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-2.5px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pot-lid,
+  .pot-steam path {
+    transition: none;
+    animation: none;
+  }
+
+  .pot.is-open .pot-steam path {
+    opacity: 0.9;
+    animation: none;
+  }
+}
+</style>

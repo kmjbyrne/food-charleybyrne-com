@@ -32,6 +32,7 @@ export default defineContentConfig({
               section: z.string(),
               match: z.string().optional(),
               options: z.array(z.string()).optional(),
+              optionPaths: z.record(z.string()).optional(),
               scopeBy: z.string().optional(),
               titlePrefix: z.boolean().optional(),
               default: z.string().optional()
@@ -43,6 +44,9 @@ export default defineContentConfig({
         paths: z.array(z.string()).optional(),
         links: z.array(z.string()).optional(),
         index: z.boolean().optional(),
+        slug: z.string().optional(),
+        inherits: z.string().optional(),
+        inheritsSection: z.string().optional(),
         motherSauce: z.boolean().optional(),
         diet: z.record(z.boolean()).optional(),
         time: z.number().optional(),
