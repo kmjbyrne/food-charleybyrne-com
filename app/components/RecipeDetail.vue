@@ -12,6 +12,8 @@ const route = useRoute()
 const router = useRouter()
 
 const recipe = computed(() => props.recipe)
+
+const chosen = ref<Record<string, string>>({})
 const slug = computed(() => recipe.value?.path ?? '')
 
 const { data: related } = await useAsyncData(() => `related-${slug.value}`, () =>
@@ -25,12 +27,6 @@ const { data: related } = await useAsyncData(() => `related-${slug.value}`, () =
 
 // Structured data must render server-side, so it reads the parsed body rather
 // than the DOM.
-const flattenText = (node: unknown): string => {
-  if (typeof node === 'string') return node
-  if (!Array.isArray(node)) return ''
-  return node.slice(2).map(flattenText).join('')
-}
-
 const flatten = (node: unknown): string => {
   if (typeof node === 'string') return node
   if (!Array.isArray(node)) return ''
@@ -477,7 +473,7 @@ const { data: parents } = await useAsyncData(
       .all()
     return all.filter(r => refs.includes(r.path ?? ''))
   },
-  { watch: [slug] }
+  { watch: [slug, chosen] }
 )
 
 const motherOf = computed(() => parents.value?.find(p => p.motherSauce) ?? null)
@@ -498,74 +494,6 @@ const { data: components } = await useAsyncData(
         recipe: all.find(r => r.path === part.recipe) ?? null
       }))
       .filter(p => p.recipe)
-  },
-  { watch: [slug] }
-)
-
-// A derivative can pull its base ingredients from the recipe it inherits, so
-// changing the mother updates every daughter.
-const { data: inherited } = await useAsyncData(
-  () => `inherits-${slug.value}`,
-  async () => {
-    const from = recipe.value?.inherits
-    if (!from) return null
-    const base = await queryCollection('recipes').path(from).first()
-    if (!base) return null
-
-    const want = (recipe.value?.inheritsSection ?? 'Ingredients').toLowerCase()
-    const items: string[] = []
-
-    // The parent may split its ingredients across variant subsections. Capture
-    // stays on until the next section at the same level or higher, and a
-    // daughter can name which of the parent's variants it builds on.
-    const variant = recipe.value?.inheritsVariant?.toLowerCase()
-    let depth = 0
-    let skipping = false
-
-    const walk = (node: unknown) => {
-      if (!Array.isArray(node)) return
-      const [tag, , ...kids] = node as [string, unknown, ...unknown[]]
-
-      const level = /^h([1-6])$/.exec(tag)?.[1]
-      if (level) {
-        const n = Number(level)
-        const label = flattenText(node).trim().toLowerCase()
-        if (label === want) {
-          depth = n
-          skipping = false
-        } else if (depth && n <= depth) {
-          depth = 0
-          skipping = false
-        } else if (depth && variant) {
-          skipping = !label.startsWith(variant)
-        }
-        return
-      }
-
-      if (depth && !skipping && tag === 'ul') {
-        for (const li of kids) {
-          if (Array.isArray(li) && li[0] === 'li') {
-            const text = flattenText(li).replace(/\s+/g, ' ').trim()
-            if (text && !items.includes(text)) items.push(text)
-          }
-        }
-        return
-      }
-      kids.forEach(walk)
-    }
-
-    ;((base.body as { value?: unknown[] })?.value ?? []).forEach(walk)
-
-    const swaps = recipe.value?.substitutes ?? []
-    const rows = items.map((text) => {
-      const swap = swaps.find(sub => text.toLowerCase().includes(sub.from.toLowerCase()))
-      return { text, swap: swap ?? null }
-    })
-    // A substitution whose target is not in the base list still needs showing.
-    for (const sub of swaps) {
-      if (!rows.some(r => r.swap === sub)) rows.push({ text: sub.from, swap: sub })
-    }
-    return { title: base.title, path: base.path, items, rows }
   },
   { watch: [slug] }
 )
@@ -599,7 +527,6 @@ const displayTitle = computed(() => {
   if (base.toLowerCase().includes(pick.toLowerCase())) return base
   return pick === 'Standard' ? base : `${pick} ${base}`
 })
-const chosen = ref<Record<string, string>>({})
 
 // Variant subsections share everything before them; only the chosen one shows.
 const variantOptions = (group: RecipeVariantGroup) => {
@@ -1103,39 +1030,6 @@ const fatPct = computed(() =>
           </NuxtLink>
         </div>
       </div>
-
-      <section
-        v-if="inherited?.rows.length"
-        class="recipe-prose"
-      >
-        <h2>Ingredients</h2>
-        <h3 class="inherited-heading">
-          From
-          <NuxtLink
-            :to="recipeUrl(inherited.path)"
-            class="text-primary-500 hover:underline"
-          >{{ inherited.title }}</NuxtLink>
-        </h3>
-        <ul>
-          <li
-            v-for="row in inherited.rows"
-            :key="row.text"
-            :title="row.swap ? `Replaces ${row.text}` : `From ${inherited.title}`"
-          >
-            <template v-if="row.swap">
-              <s class="opacity-50">{{ row.text }}</s>
-              <strong class="ml-1">{{ row.swap.to }}</strong>
-              <span
-                v-if="row.swap.note"
-                class="text-(--ui-text-dimmed)"
-              >, {{ row.swap.note }}</span>
-            </template>
-            <template v-else>
-              {{ row.text }}
-            </template>
-          </li>
-        </ul>
-      </section>
 
       <div
         v-if="recipe?.body"

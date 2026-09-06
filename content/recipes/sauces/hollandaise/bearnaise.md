@@ -38,7 +38,10 @@ juice.
 
 ### Sauce
 
+:sub-recipe{path="/recipes/sauces/hollandaise" section="Ingredients" label="Hollandaise base"}
+
 - 2 tbsp fresh tarragon leaves, chopped
+- The reduction above, in place of the lemon juice
 
 ## Method
 

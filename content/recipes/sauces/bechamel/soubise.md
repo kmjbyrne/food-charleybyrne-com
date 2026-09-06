@@ -4,6 +4,8 @@ links:
   - /recipes/sauces/bechamel
 inherits: /recipes/sauces/bechamel
 inheritsVariant: Classic
+inheritsWhen:
+  Base: Classical
 description:
   Onion sauce in two forms, the classical bechamel version and a simpler one
   built on cream alone
@@ -36,6 +38,8 @@ without splitting.
 ## Ingredients
 
 ### Classical, on bechamel
+
+:sub-recipe{path="/recipes/sauces/bechamel" section="Ingredients" variant="Classic" label="Bechamel base"}
 
 - 2 large onions, finely sliced
 - 30g butter

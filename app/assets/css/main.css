@@ -911,3 +911,33 @@ body.card-open > #__nuxt {
 .recipe-prose .inherited-heading::after {
   display: none;
 }
+
+/* A pulled-in recipe is part of the surrounding list, not a block of its own. */
+.sub-recipe {
+  margin: 0;
+  display: contents;
+}
+
+.sub-recipe-head {
+  margin: 0.4rem 0 -0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+/* A rule separates the borrowed ingredients from the recipe's own. */
+.recipe-prose .sub-recipe + ul {
+  border-top: 1px solid var(--ui-border);
+  padding-top: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.sub-recipe-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--ui-text-dimmed);
+}
+
+.sub-recipe-title:hover {
+  color: var(--ui-primary);
+}

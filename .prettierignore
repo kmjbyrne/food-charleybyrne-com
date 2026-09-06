@@ -1,0 +1,2 @@
+# MDC directives must stay on one line or their attributes are lost.
+content/**/*.md
