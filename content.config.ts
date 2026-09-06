@@ -11,6 +11,19 @@ export default defineContentConfig({
         category: z.string().optional(),
         tags: z.array(z.string()).optional(),
         image: z.string().optional(),
+        variants: z
+          .array(
+            z.object({
+              name: z.string(),
+              section: z.string(),
+              match: z.string().optional(),
+              options: z.array(z.string()).optional(),
+              scopeBy: z.string().optional(),
+              titlePrefix: z.boolean().optional(),
+              default: z.string().optional()
+            })
+          )
+          .optional(),
         cover: z.string().optional(),
         keto: z.boolean().optional(),
         diet: z.record(z.boolean()).optional(),
