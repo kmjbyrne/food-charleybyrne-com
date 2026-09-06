@@ -39,6 +39,7 @@ export interface RecipeMeta {
   slug?: string
   inherits?: string
   inheritsSection?: string
+  substitutes?: { from: string, to: string, note?: string }[]
   motherSauce?: boolean
   time?: number
   prep?: number

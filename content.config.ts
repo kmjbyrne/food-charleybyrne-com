@@ -47,6 +47,9 @@ export default defineContentConfig({
         slug: z.string().optional(),
         inherits: z.string().optional(),
         inheritsSection: z.string().optional(),
+        substitutes: z
+          .array(z.object({ from: z.string(), to: z.string(), note: z.string().optional() }))
+          .optional(),
         motherSauce: z.boolean().optional(),
         diet: z.record(z.boolean()).optional(),
         time: z.number().optional(),

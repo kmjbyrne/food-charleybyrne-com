@@ -3,6 +3,10 @@ title: Béarnaise
 links:
   - /recipes/sauces/hollandaise
 inherits: /recipes/sauces/hollandaise
+substitutes:
+  - from: lemon juice
+    to: tarragon and shallot reduction
+    note: made below
 description:
   Hollandaise built on a tarragon and shallot reduction instead of lemon
 category: Sauces
@@ -32,8 +36,6 @@ juice.
 - 6 black peppercorns, cracked
 
 ### Sauce
-
-Everything from the hollandaise base, plus:
 
 - 2 tbsp fresh tarragon leaves, chopped
 

@@ -482,7 +482,17 @@ const { data: inherited } = await useAsyncData(
     }
 
     ;((base.body as { value?: unknown[] })?.value ?? []).forEach(walk)
-    return { title: base.title, path: base.path, items }
+
+    const swaps = recipe.value?.substitutes ?? []
+    const rows = items.map((text) => {
+      const swap = swaps.find(sub => text.toLowerCase().includes(sub.from.toLowerCase()))
+      return { text, swap: swap ?? null }
+    })
+    // A substitution whose target is not in the base list still needs showing.
+    for (const sub of swaps) {
+      if (!rows.some(r => r.swap === sub)) rows.push({ text: sub.from, swap: sub })
+    }
+    return { title: base.title, path: base.path, items, rows }
   },
   { watch: [slug] }
 )
@@ -1005,14 +1015,30 @@ const fatPct = computed(() =>
             class="normal-case tracking-normal font-medium text-primary-500 hover:underline"
           >{{ inherited.title }}</NuxtLink>
         </p>
-        <ul class="px-3.5 py-2.5 flex flex-col gap-1">
+        <ul class="px-3.5 py-2.5 flex flex-col gap-1.5">
           <li
-            v-for="item in inherited.items"
-            :key="item"
-            class="text-[13px] text-(--ui-text-muted) flex items-start gap-2"
+            v-for="row in inherited.rows"
+            :key="row.text"
+            class="text-[13px] flex items-start gap-2"
+            :class="row.swap ? 'text-(--ui-text)' : 'text-(--ui-text-muted)'"
           >
-            <span class="mt-1.5 size-1 rounded-full bg-(--ui-border-accented) shrink-0" />
-            {{ item }}
+            <span
+              class="mt-1.5 size-1 rounded-full shrink-0"
+              :class="row.swap ? 'bg-primary-500' : 'bg-(--ui-border-accented)'"
+            />
+            <span v-if="row.swap">
+              <span class="line-through opacity-55">{{ row.text }}</span>
+              <UIcon
+                name="i-lucide-arrow-right"
+                class="size-3 mx-1 align-middle text-(--ui-text-dimmed)"
+              />
+              <span class="font-medium">{{ row.swap.to }}</span>
+              <span
+                v-if="row.swap.note"
+                class="text-(--ui-text-dimmed)"
+              >, {{ row.swap.note }}</span>
+            </span>
+            <span v-else>{{ row.text }}</span>
           </li>
         </ul>
       </div>
