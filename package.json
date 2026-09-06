@@ -20,6 +20,7 @@
     "@nuxt/content": "^3.13.0",
     "@nuxt/ui": "^4.7.1",
     "better-sqlite3": "^12.10.0",
+    "mermaid": "^11.17.2",
     "nuxt": "^4.4.5",
     "tailwindcss": "^4.3.0"
   },
