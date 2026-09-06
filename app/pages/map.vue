@@ -16,7 +16,7 @@ const hovered = ref<GraphNode | null>(null)
 const activeTag = ref<string | null>(null)
 
 const view = reactive({ x: 0, y: 0, scale: 1 })
-const dragging = false
+let dragging = false
 let last = { x: 0, y: 0 }
 
 const CATEGORY_HUE: Record<string, number> = {}
@@ -125,6 +125,21 @@ const nodeAt = (px: number, py: number): GraphNode | null => {
   return best
 }
 
+const onDown = (e: MouseEvent) => {
+  dragging = true
+  last = { x: e.clientX, y: e.clientY }
+}
+
+const onUp = () => {
+  dragging = false
+}
+
+const onLeave = () => {
+  dragging = false
+  hovered.value = null
+  draw()
+}
+
 const onMove = (e: MouseEvent) => {
   const el = canvas.value
   if (!el) return
@@ -208,9 +223,9 @@ useSeoMeta({
     <canvas
       ref="canvas"
       class="size-full block cursor-grab"
-      @mousedown="dragging = true; last = { x: $event.clientX, y: $event.clientY }"
-      @mouseup="dragging = false"
-      @mouseleave="dragging = false; hovered = null; draw()"
+      @mousedown="onDown"
+      @mouseup="onUp"
+      @mouseleave="onLeave"
       @mousemove="onMove"
       @wheel="onWheel"
       @click="onClick"
