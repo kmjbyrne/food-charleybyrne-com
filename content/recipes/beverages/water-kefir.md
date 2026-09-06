@@ -8,7 +8,8 @@ time: 5040
 servings: 8
 variants:
   - name: Infusion
-    section: X1 Infusion
+    section: Ingredients
+    match: "X1 option:"
     default: Lemon Mint
 tags:
   - kefir
@@ -25,6 +26,39 @@ tags:
 - 120-160g sugar
 - Pinch of sea salt
 - 15ml lemon juice
+
+### X1, Infusion
+
+Optional. Skip it for plain kefir, which is a clean drink on its own.
+
+#### X1 option: Lemon Mint
+
+- Mint leaves
+- 15ml apple cider vinegar
+
+The lemon juice in F1 already carries this one. Only add citrus here if you
+skipped it there.
+
+#### X1 option: Ginger
+
+- 30g fresh ginger, sliced thin
+
+Sharper and warming. The ginger also feeds a little wild yeast, so expect a
+livelier F2 and burp the bottles more often.
+
+#### X1 option: Berry
+
+- 100g fresh or frozen berries, lightly crushed
+
+Fruit sugars restart fermentation, so this one builds pressure fast. Cut F2 to
+12 hours and refrigerate promptly.
+
+#### X1 option: Hibiscus
+
+- 2 tbsp dried hibiscus
+
+Deep red and tart, with no added sugar. Hibiscus is already acidic, so skip the
+vinegar here and do not add citrus on top of the F1 lemon.
 
 ### F2, Second Ferment
 
@@ -61,39 +95,6 @@ tags:
 3. Refrigerate to stop the ferment.
 4. Back sweeten with stevia to taste before drinking. A little goes a long way.
 
-## X1 Infusion
-
-Optional. Skip it for plain kefir, which is a clean drink on its own.
-
-### Lemon Mint
-
-- Mint leaves
-- Dash of lime
-- 15ml apple cider vinegar
-
-### Ginger
-
-- 30g fresh ginger, sliced thin
-- Dash of lemon
-
-Sharper and warming. The ginger also feeds a little wild yeast, so expect a
-livelier F2 and burp the bottles more often.
-
-### Berry
-
-- 100g fresh or frozen berries, lightly crushed
-
-Fruit sugars restart fermentation, so this one builds pressure fast. Cut F2 to
-12 hours and refrigerate promptly.
-
-### Hibiscus and Lime
-
-- 2 tbsp dried hibiscus
-- Dash of lime
-
-Deep red and tart, with no added sugar. Hibiscus is already acidic, so skip the
-vinegar here.
-
 ## Notes
 
 - The sugar is food for the grains, not for you. The aim is to ferment out as
@@ -109,8 +110,9 @@ vinegar here.
   stevia rather than sugar if you want it sweeter without the carbohydrate.
 - Keep the grains in a fresh sugar-water solution between batches. They are
   living and need feeding.
-- The lemon juice in F1 is for the grains, the lime in X1 is for flavour. Do not
-  swap one for the other.
+- The lemon juice in F1 is for the grains, not for flavour, but it carries
+  through to the finished drink. Adding more citrus at X1 usually makes it sharp
+  rather than brighter.
 
 ## Appendix
 

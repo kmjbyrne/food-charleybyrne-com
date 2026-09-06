@@ -1,8 +1,9 @@
 <script setup lang="ts">
+import type { RecipesCollectionItem } from '@nuxt/content'
 import type { RecipeMeta, RecipeVariantGroup } from '~/types/recipe'
 
 interface Props {
-  recipe: RecipeMeta | null
+  recipe: RecipesCollectionItem | null
 }
 
 const props = defineProps<Props>()
@@ -128,11 +129,7 @@ const goToCategory = (category: string) => {
   navigateTo(`/${category.toLowerCase()}`)
 }
 
-// Nested children make the circuit highlight span the whole branch; the top
-// level is enough to navigate a recipe.
-const tocLinks = computed(() =>
-  (recipe.value?.body?.toc?.links ?? []).map(({ children, ...link }) => link)
-)
+const tocLinks = computed(() => recipe.value?.body?.toc?.links ?? [])
 
 // Most recipes are just Ingredients + Method; a two-item TOC is noise.
 const showToc = computed(() => tocLinks.value.length >= 3)
@@ -207,6 +204,10 @@ const onProseClick = (e: MouseEvent) => {
 const copied = ref(false)
 const linkCopied = ref(false)
 
+// Variant groups appear in the URL as plain lowercase keys: ?infusion=ginger
+const queryKey = (name: string) => name.toLowerCase().replace(/\s+/g, '-')
+const slugify = (value: string) => value.toLowerCase().replace(/\s+/g, '-')
+
 // A shared link should open on the same variant and scale the sender was
 // looking at, so both ride along as query params.
 const shareUrl = computed(() => {
@@ -214,7 +215,7 @@ const shareUrl = computed(() => {
   if (multiplier.value !== 1) query.set('scale', String(multiplier.value))
   for (const group of variantGroups.value) {
     const pick = chosen.value[group.name]
-    if (pick && pick !== group.default) query.set(`v.${group.name}`, pick)
+    if (pick && pick !== group.default) query.set(queryKey(group.name), slugify(pick))
   }
   const qs = query.toString()
   const origin = import.meta.client ? location.origin : site
@@ -252,6 +253,12 @@ onMounted(() => {
 
 watch(cardOpen, (open) => {
   document.body.style.overflow = open ? 'hidden' : ''
+  document.body.classList.toggle('card-open', open)
+})
+
+onBeforeUnmount(() => {
+  document.body.style.overflow = ''
+  document.body.classList.remove('card-open')
 })
 
 // The card mirrors the current selection, so it reads from the rendered prose.
@@ -293,7 +300,12 @@ const buildCard = () => {
       }
     }
   }
-  cardSections.value = out.filter(s => s.items.length || s.steps.length)
+  // Variant sections live at the end of the document, but on a card they
+  // belong with the other ingredients rather than after the method.
+  const kept = out.filter(s => s.items.length || s.steps.length)
+  const ingredients = kept.filter(s => s.items.length && !s.steps.length)
+  const rest = kept.filter(s => !(s.items.length && !s.steps.length))
+  cardSections.value = [...ingredients, ...rest]
 }
 
 const openCard = () => {
@@ -387,6 +399,14 @@ const copyRecipe = async () => {
 
 const variantGroups = computed(() => recipe.value?.variants ?? [])
 
+// Restore the selection a shared link carried: ?infusion=ginger
+watchEffect(() => {
+  for (const group of variantGroups.value) {
+    const raw = route.query[queryKey(group.name)]
+    if (raw && !chosen.value[group.name]) chosen.value[group.name] = String(raw)
+  }
+})
+
 // A diet-style group can qualify the title, so "Keto BBQ Sauce" reads correctly
 // without duplicating the recipe.
 const displayTitle = computed(() => {
@@ -406,13 +426,7 @@ const displayTitle = computed(() => {
   if (base.toLowerCase().includes(pick.toLowerCase())) return base
   return pick === 'Standard' ? base : `${pick} ${base}`
 })
-const chosen = ref<Record<string, string>>(
-  Object.fromEntries(
-    Object.entries(route.query)
-      .filter(([k]) => k.startsWith('v.'))
-      .map(([k, v]) => [k.slice(2), String(v)])
-  )
-)
+const chosen = ref<Record<string, string>>({})
 
 // Variant subsections share everything before them; only the chosen one shows.
 const variantOptions = (group: RecipeVariantGroup) => {
@@ -424,7 +438,7 @@ const variantOptions = (group: RecipeVariantGroup) => {
   const out: HTMLElement[] = []
   let node = parent.nextElementSibling
   while (node && node.tagName !== 'H2') {
-    if (node.tagName === 'H3') {
+    if (node.tagName === 'H3' || node.tagName === 'H4') {
       const label = node.textContent?.trim() ?? ''
       const matches = !group.match || label.toLowerCase().includes(group.match.toLowerCase())
       const scope = group.scopeBy ? chosen.value[group.scopeBy] : null
@@ -441,7 +455,10 @@ const applyScopes = () => {
   if (!prose.value) return
   for (const group of variantGroups.value) {
     if (!group.options) continue
-    const pick = chosen.value[group.name] ?? group.default ?? group.options[0]!
+    const wanted = chosen.value[group.name] ?? group.default
+    const pick = group.options.find(o => o === wanted)
+      ?? group.options.find(o => wanted && slugify(o) === slugify(wanted))
+      ?? group.options[0]!
     for (const heading of prose.value.querySelectorAll('h3')) {
       const label = heading.textContent?.trim().toLowerCase() ?? ''
       const owner = group.options.find(o => label.startsWith(o.toLowerCase()))
@@ -464,7 +481,10 @@ const applyVariants = () => {
     // A declared-options group (Diet) has no headings of its own; it selects
     // which of another group's headings are eligible.
     if (group.options) {
-      const pick = chosen.value[group.name] ?? group.default ?? group.options[0]!
+      const wanted = chosen.value[group.name] ?? group.default
+      const pick = group.options.find(o => o === wanted)
+        ?? group.options.find(o => wanted && slugify(o) === slugify(wanted))
+        ?? group.options[0]!
       chosen.value[group.name] = pick
       continue
     }
@@ -474,14 +494,16 @@ const applyVariants = () => {
     const labels = options.map(h => h.textContent?.trim() ?? '')
     const wanted = chosen.value[group.name] ?? group.default
     const pick = labels.find(l => l === wanted)
-      ?? labels.find(l => wanted && l.startsWith(wanted))
+      ?? labels.find(l => wanted && slugify(l) === slugify(wanted))
+      ?? labels.find(l => wanted && l.toLowerCase().startsWith(wanted.toLowerCase()))
       ?? labels[0]!
     chosen.value[group.name] = pick
     for (const heading of options) {
       const active = (heading.textContent?.trim() ?? '').replace(/\s*⇄\s*$/, '') === pick
       heading.toggleAttribute('data-variant-hidden', !active)
+      const level = Number(heading.tagName[1])
       let node = heading.nextElementSibling
-      while (node && !['H2', 'H3'].includes(node.tagName)) {
+      while (node && !(/^H[1-6]$/.test(node.tagName) && Number(node.tagName[1]) <= level)) {
         node.toggleAttribute('data-variant-hidden', !active)
         node = node.nextElementSibling
       }
@@ -526,7 +548,7 @@ const syncQuery = () => {
   if (multiplier.value !== 1) query.scale = String(multiplier.value)
   for (const g of variantGroups.value) {
     const pick = chosen.value[g.name]
-    if (pick && pick !== g.default) query[`v.${g.name}`] = pick
+    if (pick && pick !== g.default) query[queryKey(g.name)] = slugify(pick)
   }
   router.replace({ query })
 }
@@ -773,7 +795,7 @@ const fatPct = computed(() =>
               : 'text-(--ui-text-muted) hover:bg-(--ui-bg-elevated)'"
             @click="selectVariant(group.name, option)"
           >
-            {{ option.replace(group.match ?? '', '').replace(/^[\s:.\d]+/, '') || option }}
+            {{ option.replace(group.match ?? '', '').replace(/^[\s:.\-\d]+/, '') || option }}
           </button>
         </div>
       </div>
@@ -882,6 +904,7 @@ const fatPct = computed(() =>
               </div>
               <div
                 v-for="group in variantGroups"
+                v-show="chosen[group.name]"
                 :key="group.name"
               >
                 <dt>{{ group.name }}</dt>

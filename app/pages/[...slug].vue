@@ -10,7 +10,8 @@ const { data: recipe } = await useAsyncData(
   () => queryCollection('recipes').path(`/recipes${path.value}`).first()
 )
 
-const isRecipe = computed(() => Boolean(recipe.value))
+const entry = computed(() => recipe.value ?? null)
+const isRecipe = computed(() => Boolean(entry.value))
 
 // The sidebar and filters need to know which kind of page this is.
 watchEffect(() => {
@@ -21,7 +22,7 @@ watchEffect(() => {
 <template>
   <RecipeDetail
     v-if="isRecipe"
-    :recipe="recipe"
+    :recipe="entry"
   />
   <RecipeIndex v-else />
 </template>

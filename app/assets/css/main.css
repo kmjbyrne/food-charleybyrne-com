@@ -159,6 +159,13 @@
   font-family: var(--font-sans);
 }
 
+.recipe-prose h4 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--ui-text-muted);
+  margin: 1rem 0 0.4rem;
+}
+
 .recipe-prose h3 {
   font-size: 0.9375rem;
   font-weight: 600;
@@ -637,16 +644,15 @@
 }
 
 /*
- * The blur sits on its own fixed layer. On the scrolling element it repaints
- * the whole viewport every frame.
+ * No backdrop-filter here. The whole recipe, mermaid SVG included, sits behind
+ * this overlay, and blurring it composites that entire subtree every frame.
  */
 .recipe-card-overlay::before {
   content: "";
   position: fixed;
   inset: 0;
   z-index: -1;
-  background: color-mix(in srgb, var(--ui-bg-inverted) 45%, transparent);
-  backdrop-filter: blur(4px);
+  background: color-mix(in srgb, var(--ui-bg-inverted) 60%, transparent);
 }
 
 .recipe-card {
@@ -660,7 +666,7 @@
   background: var(--ui-bg);
   border: 1px solid var(--ui-border);
   border-radius: 12px;
-  box-shadow: 0 24px 60px -20px rgb(0 0 0 / 0.35);
+  box-shadow: 0 8px 24px -12px rgb(0 0 0 / 0.3);
 }
 
 .recipe-card-head {
@@ -851,4 +857,13 @@
   .recipe-card-body section {
     break-inside: avoid;
   }
+
+  .recipe-card-meta div:has(dd:empty) {
+    display: none;
+  }
+}
+
+/* The page behind a full-screen card does not need painting at all. */
+body.card-open > #__nuxt {
+  content-visibility: hidden;
 }
