@@ -8,7 +8,7 @@ time: 2160
 servings: 8
 variants:
   - name: Infusion
-    section: Infusion Variants
+    section: X1 Infusion
     default: Lemon Mint
 tags:
   - kefir
@@ -26,15 +26,12 @@ tags:
 - Pinch of sea salt
 - 15ml lemon juice
 
-### X1, Infusion (Optional)
-
-- Mint leaves
-- Dash of lime
-- 15ml apple cider vinegar
-
 ### F2, Second Ferment
 
 - Stevia to back sweeten, optional
+
+For the X1 infusion, pick one of the options below. It is optional; skip it for
+plain kefir.
 
 ## Method
 
@@ -69,7 +66,7 @@ tags:
 3. Refrigerate to stop the ferment.
 4. Back sweeten with stevia to taste before drinking. A little goes a long way.
 
-## Infusion Variants
+## X1 Infusion
 
 All optional. Pick one, or skip X1 entirely for plain kefir. The method does not
 change: infuse overnight, strain, then bottle for F2.
