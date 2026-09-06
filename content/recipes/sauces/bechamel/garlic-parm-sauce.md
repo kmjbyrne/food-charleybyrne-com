@@ -3,6 +3,7 @@ title: Garlic Parmesan Sauce
 links:
   - /recipes/sauces/bechamel/bechamel
 inherits: /recipes/sauces/bechamel
+inheritsVariant: Classic
 paths:
   - sauces/cooking
 description: Creamy garlic and parmesan sauce built on a beef stock base

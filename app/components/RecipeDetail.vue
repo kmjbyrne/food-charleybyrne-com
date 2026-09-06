@@ -514,20 +514,39 @@ const { data: inherited } = await useAsyncData(
 
     const want = (recipe.value?.inheritsSection ?? 'Ingredients').toLowerCase()
     const items: string[] = []
-    let capture = false
+
+    // The parent may split its ingredients across variant subsections. Capture
+    // stays on until the next section at the same level or higher, and a
+    // daughter can name which of the parent's variants it builds on.
+    const variant = recipe.value?.inheritsVariant?.toLowerCase()
+    let depth = 0
+    let skipping = false
 
     const walk = (node: unknown) => {
       if (!Array.isArray(node)) return
       const [tag, , ...kids] = node as [string, unknown, ...unknown[]]
-      if (/^h[23]$/.test(tag)) {
-        capture = flattenText(node).trim().toLowerCase() === want
+
+      const level = /^h([1-6])$/.exec(tag)?.[1]
+      if (level) {
+        const n = Number(level)
+        const label = flattenText(node).trim().toLowerCase()
+        if (label === want) {
+          depth = n
+          skipping = false
+        } else if (depth && n <= depth) {
+          depth = 0
+          skipping = false
+        } else if (depth && variant) {
+          skipping = !label.startsWith(variant)
+        }
         return
       }
-      if (capture && tag === 'ul') {
+
+      if (depth && !skipping && tag === 'ul') {
         for (const li of kids) {
           if (Array.isArray(li) && li[0] === 'li') {
             const text = flattenText(li).replace(/\s+/g, ' ').trim()
-            if (text) items.push(text)
+            if (text && !items.includes(text)) items.push(text)
           }
         }
         return
@@ -719,7 +738,6 @@ const selectVariant = (group: string, option: string) => {
   applyVariants()
   indexVariants()
   syncQuery()
-  nextTick(injectInherited)
 }
 
 // A section runs from its heading to the next one of the same or higher level,
@@ -738,62 +756,6 @@ const setCollapsed = (heading: Element, hide: boolean) => {
 }
 
 // Collapsed headings show what they are hiding.
-// Inherited items belong inside the section they extend, marked as coming from
-// the parent, rather than sitting in a panel of their own.
-const injectInherited = () => {
-  if (!prose.value || !inherited.value) return
-  const named = recipe.value?.inheritsSection?.toLowerCase()
-
-  // Prefer the named section, then the conventional one, then the first visible
-  // ingredient list. Hidden variant sections are skipped so the base lands in
-  // the one the reader is actually looking at.
-  const visible = (el: Element) =>
-    !el.hasAttribute('data-variant-hidden') && !el.hasAttribute('data-scope-hidden')
-
-  const headings = [...prose.value.querySelectorAll('h2, h3, h4')].filter(visible)
-  const label = (h: Element) => (h.textContent ?? '').trim().toLowerCase()
-
-  const heading = (named && headings.find(h => label(h) === named))
-    ?? headings.find(h => label(h) === 'added to the base')
-    ?? headings.find(h => label(h).startsWith('added to'))
-    ?? headings.find(h => h.tagName !== 'H2' && h.closest('.recipe-prose') && (() => {
-      let n = h.nextElementSibling
-      while (n && !['UL', 'OL', 'H2', 'H3', 'H4'].includes(n.tagName)) n = n.nextElementSibling
-      return n?.tagName === 'UL'
-    })())
-    ?? headings.find(h => label(h) === 'ingredients')
-
-  {
-    if (!heading) return
-    let list = heading.nextElementSibling
-    while (list && !['UL', 'OL'].includes(list.tagName)) list = list.nextElementSibling
-    if (!list || list.querySelector('[data-inherited]')) return
-
-    for (const row of [...inherited.value.rows].reverse()) {
-      const li = document.createElement('li')
-      li.setAttribute('data-inherited', '')
-      li.title = row.swap
-        ? `Replaces "${row.text}" from ${inherited.value.title}`
-        : `From ${inherited.value.title}`
-
-      const link = document.createElement('a')
-      link.href = recipeUrl(inherited.value.path)
-      link.className = 'inherited-mark'
-      link.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>'
-
-      const text = document.createElement('span')
-      if (row.swap) {
-        text.innerHTML = `<s>${row.text}</s> <b>${row.swap.to}</b>`
-      } else {
-        text.textContent = row.text
-      }
-
-      li.append(link, text)
-      list.prepend(li)
-    }
-  }
-}
-
 const labelSections = () => {
   if (!prose.value) return
   const headings = prose.value.querySelectorAll('h2, h3')
@@ -842,9 +804,6 @@ watch(multiplier, () => {
   applyScaling()
   syncQuery()
 })
-
-// The parent's ingredients arrive asynchronously, so inject once they land.
-watch(inherited, () => nextTick(injectInherited), { immediate: true })
 
 onMounted(() => {
   restoreChecks()
@@ -1114,49 +1073,6 @@ const fatPct = computed(() =>
         </div>
       </div>
 
-      <details
-        v-if="inherited?.items.length"
-        class="rounded-lg border border-(--ui-border) bg-(--ui-bg-muted) overflow-hidden"
-      >
-        <summary class="px-3.5 py-2 text-[11px] font-semibold uppercase tracking-widest text-(--ui-text-dimmed) flex items-center gap-1.5 cursor-pointer select-none hover:text-(--ui-text)">
-          <UIcon
-            name="i-lucide-link"
-            class="size-3"
-          />
-          From
-          <NuxtLink
-            :to="recipeUrl(inherited.path)"
-            class="normal-case tracking-normal font-medium text-primary-500 hover:underline"
-          >{{ inherited.title }}</NuxtLink>
-        </summary>
-        <ul class="px-3.5 py-2.5 flex flex-col gap-1.5">
-          <li
-            v-for="row in inherited.rows"
-            :key="row.text"
-            class="text-[13px] flex items-start gap-2"
-            :class="row.swap ? 'text-(--ui-text)' : 'text-(--ui-text-muted)'"
-          >
-            <span
-              class="mt-1.5 size-1 rounded-full shrink-0"
-              :class="row.swap ? 'bg-primary-500' : 'bg-(--ui-border-accented)'"
-            />
-            <span v-if="row.swap">
-              <span class="line-through opacity-55">{{ row.text }}</span>
-              <UIcon
-                name="i-lucide-arrow-right"
-                class="size-3 mx-1 align-middle text-(--ui-text-dimmed)"
-              />
-              <span class="font-medium">{{ row.swap.to }}</span>
-              <span
-                v-if="row.swap.note"
-                class="text-(--ui-text-dimmed)"
-              >, {{ row.swap.note }}</span>
-            </span>
-            <span v-else>{{ row.text }}</span>
-          </li>
-        </ul>
-      </details>
-
       <div
         v-if="components?.length"
         class="flex flex-col gap-2"
@@ -1187,6 +1103,39 @@ const fatPct = computed(() =>
           </NuxtLink>
         </div>
       </div>
+
+      <section
+        v-if="inherited?.rows.length"
+        class="recipe-prose"
+      >
+        <h2>Ingredients</h2>
+        <h3 class="inherited-heading">
+          From
+          <NuxtLink
+            :to="recipeUrl(inherited.path)"
+            class="text-primary-500 hover:underline"
+          >{{ inherited.title }}</NuxtLink>
+        </h3>
+        <ul>
+          <li
+            v-for="row in inherited.rows"
+            :key="row.text"
+            :title="row.swap ? `Replaces ${row.text}` : `From ${inherited.title}`"
+          >
+            <template v-if="row.swap">
+              <s class="opacity-50">{{ row.text }}</s>
+              <strong class="ml-1">{{ row.swap.to }}</strong>
+              <span
+                v-if="row.swap.note"
+                class="text-(--ui-text-dimmed)"
+              >, {{ row.swap.note }}</span>
+            </template>
+            <template v-else>
+              {{ row.text }}
+            </template>
+          </li>
+        </ul>
+      </section>
 
       <div
         v-if="recipe?.body"

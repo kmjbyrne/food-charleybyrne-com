@@ -902,3 +902,12 @@ body.card-open > #__nuxt {
 .recipe-prose li[data-inherited] s {
   opacity: 0.5;
 }
+
+/* The inherited block reuses prose styling but its heading carries a link. */
+.recipe-prose .inherited-heading {
+  cursor: default;
+}
+
+.recipe-prose .inherited-heading::after {
+  display: none;
+}

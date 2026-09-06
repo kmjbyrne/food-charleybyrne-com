@@ -3,6 +3,7 @@ title: Nantua
 links:
   - /recipes/sauces/bechamel
 inherits: /recipes/sauces/bechamel
+inheritsVariant: Classic
 description:
   Bechamel enriched with crayfish butter and cream, for fish and quenelles
 category: Sauces

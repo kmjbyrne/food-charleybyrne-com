@@ -3,6 +3,7 @@ title: Soubise
 links:
   - /recipes/sauces/bechamel
 inherits: /recipes/sauces/bechamel
+inheritsVariant: Classic
 description:
   Onion sauce in two forms, the classical bechamel version and a simpler one
   built on cream alone

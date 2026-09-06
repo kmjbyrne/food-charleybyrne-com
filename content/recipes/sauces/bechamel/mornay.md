@@ -3,6 +3,7 @@ title: Mornay
 links:
   - /recipes/sauces/bechamel
 inherits: /recipes/sauces/bechamel
+inheritsVariant: Classic
 description:
   Bechamel enriched with gruyere and parmesan, the classic cheese sauce
 category: Sauces

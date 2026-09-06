@@ -108,6 +108,16 @@ const parentHub = computed(() => {
     : null
 })
 
+// A mother sauce lists what derives from it, so those become links too.
+const derivedFrom = computed(() => {
+  const node = active.value
+  if (!node) return []
+  const base = node.recipePath ?? node.id
+  return graph.value.nodes.filter(n =>
+    n.kind === 'recipe' && (n.id ?? '').startsWith(`${base}/`)
+  )
+})
+
 const related = computed(() => {
   const node = active.value
   if (!node || node.kind === 'hub') return []
@@ -124,7 +134,9 @@ const related = computed(() => {
 })
 const activeTag = ref<string | null>(null)
 
-const view = reactive({ x: 0, y: 0, scale: 0.55 })
+// Selecting a node changes the route, which remounts this page. Keeping the
+// viewport in shared state stops the map jumping back to its start position.
+const view = useState('map-view', () => reactive({ x: 0, y: 0, scale: 0.55 })).value
 let dragging = false
 let last = { x: 0, y: 0 }
 // A pan ends in a click event, so only treat it as a click if nothing moved.
@@ -495,6 +507,29 @@ useSeoMeta({
                   />
                   <span class="flex-1 truncate">{{ group.title }}</span>
                   <span class="text-[11px] text-(--ui-text-dimmed)">{{ group.count }}</span>
+                </button>
+              </li>
+            </ul>
+          </div>
+
+          <div v-if="derivedFrom.length">
+            <p class="text-[10px] font-semibold uppercase tracking-widest text-(--ui-text-dimmed) mb-2">
+              Derivatives
+            </p>
+            <ul class="flex flex-col gap-0.5 mb-4">
+              <li
+                v-for="item in derivedFrom"
+                :key="item.id"
+              >
+                <button
+                  class="w-full text-left flex items-center gap-2 px-2 py-1.5 rounded-md text-[13px] text-(--ui-text-muted) hover:bg-(--ui-bg-elevated) hover:text-(--ui-text) transition-colors"
+                  @click="select(item)"
+                >
+                  <UIcon
+                    name="i-lucide-git-branch"
+                    class="size-3.5 shrink-0 opacity-60"
+                  />
+                  <span class="truncate">{{ item.title }}</span>
                 </button>
               </li>
             </ul>

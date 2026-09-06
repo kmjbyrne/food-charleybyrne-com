@@ -47,6 +47,7 @@ export default defineContentConfig({
         slug: z.string().optional(),
         inherits: z.string().optional(),
         inheritsSection: z.string().optional(),
+        inheritsVariant: z.string().optional(),
         components: z
           .array(z.object({ recipe: z.string(), label: z.string().optional() }))
           .optional(),
