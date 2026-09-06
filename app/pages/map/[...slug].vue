@@ -23,12 +23,56 @@ const selectedPath = computed(() => {
   return parts.length ? `/recipes/${parts.join('/')}` : ''
 })
 
-const active = computed(() =>
-  graph.value.nodes.find(n => n.id === selectedPath.value) ?? null
-)
+const active = computed(() => {
+  const path = selectedPath.value
+  if (!path) return null
+  const key = path.replace('/recipes/', '')
+  return graph.value.nodes.find(n => n.id === path)
+    ?? graph.value.nodes.find(n => n.id === `hub:${key}`)
+    ?? null
+})
 
 const select = (node: GraphNode | null) => {
-  router.push(node ? `/map${recipeUrl(node.id)}` : '/map')
+  if (!node) return router.push('/map')
+  const target = node.kind === 'hub' ? `/map/${node.category}` : `/map${recipeUrl(node.id)}`
+  return router.push(target)
+}
+
+// Everything hanging off the selected hub: its child hubs and their recipes.
+const subtree = computed(() => {
+  const node = active.value
+  if (node?.kind !== 'hub') return new Set<string>()
+  const prefix = node.category
+  const ids = new Set<string>([node.id])
+  for (const other of graph.value.nodes) {
+    if (other.kind === 'hub' && other.category.startsWith(`${prefix}/`)) ids.add(other.id)
+    if (other.kind === 'recipe' && (other.hub === prefix || other.hub?.startsWith(`${prefix}/`))) {
+      ids.add(other.id)
+    }
+  }
+  return ids
+})
+
+// The full body is only fetched when the reader opens the second drawer, so
+// the map itself stays a light query.
+const expanded = ref(false)
+
+const { data: full } = await useAsyncData(
+  () => `map-full-${selectedPath.value}`,
+  () => (expanded.value && selectedPath.value
+    ? queryCollection('recipes').path(selectedPath.value).first()
+    : Promise.resolve(null)),
+  { watch: [selectedPath, expanded] }
+)
+
+watch(selectedPath, () => {
+  expanded.value = false
+})
+
+const onDrawerKey = (e: KeyboardEvent) => {
+  if (e.key !== 'Escape') return
+  if (expanded.value) expanded.value = false
+  else if (active.value) select(null)
 }
 
 const detail = computed(() => {
@@ -37,10 +81,34 @@ const detail = computed(() => {
   return recipes.value.find(r => r.path === node.id) ?? null
 })
 
+// A hub's drawer lists its child categories and the recipes it holds.
+const hubChildren = computed(() => {
+  const node = active.value
+  if (node?.kind !== 'hub') return { groups: [] as GraphNode[], items: [] as GraphNode[] }
+  const prefix = node.category
+  return {
+    groups: graph.value.nodes.filter(
+      n => n.kind === 'hub' && n.category.startsWith(`${prefix}/`)
+        && n.category.split('/').length === prefix.split('/').length + 1
+    ),
+    items: graph.value.nodes.filter(n => n.kind === 'recipe' && n.hub === prefix)
+  }
+})
+
+const parentHub = computed(() => {
+  const node = active.value
+  if (node?.kind !== 'hub') return null
+  const parent = node.category.split('/').slice(0, -1).join('/')
+  return parent
+    ? graph.value.nodes.find(n => n.id === `hub:${parent}`) ?? null
+    : null
+})
+
 const related = computed(() => {
   const node = active.value
-  if (!node) return []
+  if (!node || node.kind === 'hub') return []
   return graph.value.edges
+    .filter(e => e.kind !== 'spoke')
     .filter(e => e.a.id === node.id || e.b.id === node.id)
     .map(e => ({
       node: e.a.id === node.id ? e.b : e.a,
@@ -55,6 +123,8 @@ const activeTag = ref<string | null>(null)
 const view = reactive({ x: 0, y: 0, scale: 0.55 })
 let dragging = false
 let last = { x: 0, y: 0 }
+// A pan ends in a click event, so only treat it as a click if nothing moved.
+let moved = 0
 
 const CATEGORY_HUE: Record<string, number> = {}
 const hueFor = (key: string) => {
@@ -86,6 +156,7 @@ const draw = () => {
   const tagLit = dark ? 'rgba(190,225,150,0.95)' : 'rgba(60,95,35,0.9)'
   const linkLine = dark ? 'rgba(235,160,90,0.8)' : 'rgba(180,90,25,0.75)'
   const linkLit = dark ? 'rgba(255,185,115,1)' : 'rgba(150,70,10,1)'
+  const spokeLine = dark ? 'rgba(140,150,130,0.35)' : 'rgba(90,100,80,0.28)'
 
   ctx.clearRect(0, 0, w, h)
   ctx.save()
@@ -100,7 +171,10 @@ const draw = () => {
   const selected = active.value
   for (const edge of graph.value.edges) {
     const touches = focus && (edge.a === focus || edge.b === focus)
-    const picked = selected && (edge.a.id === selected.id || edge.b.id === selected.id)
+    const tree = subtree.value
+    const picked = tree.size
+      ? tree.has(edge.a.id) && tree.has(edge.b.id)
+      : selected && (edge.a.id === selected.id || edge.b.id === selected.id)
     const tagged = tag && edge.a.tags.includes(tag) && edge.b.tags.includes(tag)
     const lit = Boolean(touches || picked || tagged)
     const dimmed = Boolean((tag || focus || selected) && !lit)
@@ -109,7 +183,11 @@ const draw = () => {
     ctx.moveTo(edge.a.x, edge.a.y)
     ctx.lineTo(edge.b.x, edge.b.y)
 
-    if (edge.kind === 'link') {
+    if (edge.kind === 'spoke') {
+      ctx.strokeStyle = spokeLine
+      ctx.globalAlpha = dimmed ? 0.12 : lit ? 0.9 : 0.55
+      ctx.lineWidth = lit ? 1.4 : 0.8
+    } else if (edge.kind === 'link') {
       ctx.strokeStyle = lit ? linkLit : linkLine
       ctx.globalAlpha = dimmed ? 0.15 : 1
       ctx.lineWidth = lit ? 2.6 : 1.9
@@ -137,7 +215,12 @@ const draw = () => {
     }
 
     const isFocus = focus === node
-    const inTag = tag ? node.tags.includes(tag) : true
+    const tree = subtree.value
+    const inTag = tag
+      ? node.tags.includes(tag)
+      : tree.size
+        ? tree.has(node.id)
+        : true
 
     ctx.beginPath()
     ctx.arc(node.x, node.y, isFocus ? node.r + 2.5 : node.r, 0, Math.PI * 2)
@@ -177,6 +260,7 @@ const nodeAt = (px: number, py: number): GraphNode | null => {
 
 const onDown = (e: MouseEvent) => {
   dragging = true
+  moved = 0
   last = { x: e.clientX, y: e.clientY }
 }
 
@@ -196,8 +280,11 @@ const onMove = (e: MouseEvent) => {
   const box = el.getBoundingClientRect()
 
   if (dragging) {
-    view.x += e.clientX - last.x
-    view.y += e.clientY - last.y
+    const dx = e.clientX - last.x
+    const dy = e.clientY - last.y
+    moved += Math.abs(dx) + Math.abs(dy)
+    view.x += dx
+    view.y += dy
     last = { x: e.clientX, y: e.clientY }
     draw()
     return
@@ -220,15 +307,14 @@ const onWheel = (e: WheelEvent) => {
 
 const onClick = (e: MouseEvent) => {
   const el = canvas.value
-  if (!el) return
+  if (!el || moved > 4) return
   const box = el.getBoundingClientRect()
   const found = nodeAt(e.clientX - box.left, e.clientY - box.top)
   if (found?.kind === 'recipe') {
     select(found)
     return
   }
-  if (found?.kind === 'hub') navigateTo(`/${found.category}`)
-  select(null)
+  select(found ?? null)
 }
 
 const reset = () => {
@@ -255,6 +341,8 @@ const pickTag = (tag: string) => {
 
 onMounted(() => {
   draw()
+  window.addEventListener('keydown', onDrawerKey)
+  onBeforeUnmount(() => window.removeEventListener('keydown', onDrawerKey))
   const observer = new ResizeObserver(draw)
   if (canvas.value) observer.observe(canvas.value)
   const themeWatch = new MutationObserver(draw)
@@ -345,15 +433,28 @@ useSeoMeta({
       >
         <div class="p-4 flex items-start justify-between gap-3 border-b border-(--ui-border)">
           <div class="min-w-0">
+            <button
+              v-if="parentHub"
+              class="text-[10px] font-semibold uppercase tracking-wider text-primary-500 hover:underline"
+              @click="select(parentHub)"
+            >
+              {{ parentHub.title }}
+            </button>
             <p
-              v-if="detail.category"
+              v-else-if="detail?.category"
               class="text-[10px] font-semibold uppercase tracking-wider text-primary-500"
             >
               {{ detail.category }}
             </p>
             <h2 class="text-base font-bold tracking-tight text-(--ui-text-highlighted) mt-0.5">
-              {{ detail.title }}
+              {{ detail?.title ?? active.title }}
             </h2>
+            <p
+              v-if="active.kind === 'hub'"
+              class="text-[11px] text-(--ui-text-dimmed) mt-0.5"
+            >
+              {{ active.count }} recipes
+            </p>
           </div>
           <button
             class="shrink-0 size-7 grid place-items-center rounded-md border border-(--ui-border) text-(--ui-text-muted) hover:text-(--ui-text) transition-colors"
@@ -367,12 +468,74 @@ useSeoMeta({
           </button>
         </div>
 
-        <div class="p-4 flex flex-col gap-4">
+        <div
+          v-if="active.kind === 'hub'"
+          class="p-4 flex flex-col gap-4"
+        >
+          <div v-if="hubChildren.groups.length">
+            <p class="text-[10px] font-semibold uppercase tracking-widest text-(--ui-text-dimmed) mb-2">
+              Sub-categories
+            </p>
+            <ul class="flex flex-col gap-0.5">
+              <li
+                v-for="group in hubChildren.groups"
+                :key="group.id"
+              >
+                <button
+                  class="w-full text-left flex items-center gap-2 px-2 py-1.5 rounded-md text-[13px] text-(--ui-text-muted) hover:bg-(--ui-bg-elevated) hover:text-(--ui-text) transition-colors"
+                  @click="select(group)"
+                >
+                  <UIcon
+                    name="i-lucide-folder"
+                    class="size-3.5 shrink-0 opacity-60"
+                  />
+                  <span class="flex-1 truncate">{{ group.title }}</span>
+                  <span class="text-[11px] text-(--ui-text-dimmed)">{{ group.count }}</span>
+                </button>
+              </li>
+            </ul>
+          </div>
+
+          <div v-if="hubChildren.items.length">
+            <p class="text-[10px] font-semibold uppercase tracking-widest text-(--ui-text-dimmed) mb-2">
+              Recipes
+            </p>
+            <ul class="flex flex-col gap-0.5">
+              <li
+                v-for="item in hubChildren.items"
+                :key="item.id"
+              >
+                <button
+                  class="w-full text-left px-2 py-1.5 rounded-md text-[13px] text-(--ui-text-muted) hover:bg-(--ui-bg-elevated) hover:text-(--ui-text) transition-colors truncate"
+                  @click="select(item)"
+                >
+                  {{ item.title }}
+                </button>
+              </li>
+            </ul>
+          </div>
+
+          <UButton
+            :to="`/${active.category}`"
+            icon="i-lucide-arrow-right"
+            trailing
+            color="primary"
+            variant="soft"
+            size="sm"
+            label="Browse category"
+            block
+          />
+        </div>
+
+        <div
+          v-else
+          class="p-4 flex flex-col gap-4"
+        >
           <p
-            v-if="detail.description"
+            v-if="detail?.description"
             class="text-[13px]/relaxed text-(--ui-text-muted)"
           >
-            {{ detail.description }}
+            {{ detail?.description }}
           </p>
 
           <div
@@ -426,15 +589,65 @@ useSeoMeta({
           </div>
 
           <UButton
-            :to="recipeUrl(active.id)"
-            icon="i-lucide-arrow-right"
+            icon="i-lucide-maximize-2"
             trailing
             color="primary"
             variant="soft"
             size="sm"
             label="Open recipe"
             block
+            @click="expanded = true"
           />
+        </div>
+      </aside>
+    </Transition>
+
+    <Transition
+      enter-active-class="transition duration-250 ease-out"
+      enter-from-class="translate-x-full"
+      leave-active-class="transition duration-200 ease-in"
+      leave-to-class="translate-x-full"
+    >
+      <aside
+        v-if="expanded && full"
+        class="absolute top-0 right-0 size-full md:w-[620px] z-30 flex flex-col border-l border-(--ui-border) bg-(--ui-bg) shadow-2xl overflow-y-auto"
+      >
+        <div class="sticky top-0 z-10 px-5 py-3 flex items-center justify-between gap-3 border-b border-(--ui-border) bg-(--ui-bg)">
+          <div class="flex items-center gap-2 min-w-0">
+            <button
+              class="shrink-0 size-7 grid place-items-center rounded-md border border-(--ui-border) text-(--ui-text-muted) hover:text-(--ui-text) transition-colors"
+              title="Back to connections"
+              @click="expanded = false"
+            >
+              <UIcon
+                name="i-lucide-chevron-left"
+                class="size-4"
+              />
+            </button>
+            <p class="text-sm font-semibold truncate text-(--ui-text-highlighted)">
+              {{ full.title }}
+            </p>
+          </div>
+          <UButton
+            :to="recipeUrl(full.path)"
+            icon="i-lucide-external-link"
+            color="neutral"
+            variant="ghost"
+            size="xs"
+            label="Full page"
+          />
+        </div>
+
+        <div class="px-5 py-4 flex flex-col gap-4">
+          <p
+            v-if="full.description"
+            class="text-sm/relaxed text-(--ui-text-muted)"
+          >
+            {{ full.description }}
+          </p>
+          <div class="recipe-prose">
+            <ContentRenderer :value="full" />
+          </div>
         </div>
       </aside>
     </Transition>

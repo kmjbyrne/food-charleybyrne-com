@@ -10,13 +10,14 @@ export interface GraphNode {
   r: number
   kind: 'hub' | 'recipe'
   hub?: string
+  count?: number
 }
 
 export interface GraphEdge {
   a: GraphNode
   b: GraphNode
   weight: number
-  kind: 'tag' | 'link'
+  kind: 'tag' | 'link' | 'spoke'
   shared: string[]
 }
 
@@ -28,41 +29,78 @@ export const useRecipeGraph = (recipes: Ref<RecipeMeta[]> | ComputedRef<RecipeMe
     const byHub = new Map<string, RecipeMeta[]>()
 
     for (const recipe of list) {
-      const hub = (recipe.path ?? '').split('/').filter(Boolean).slice(1, -1)[0] ?? 'other'
+      // The full directory path is the hub, so keto/desserts is its own group
+      // rather than being folded into keto.
+      const dirs = (recipe.path ?? '').split('/').filter(Boolean).slice(1, -1)
+      const hub = dirs.length
+        ? dirs.join('/')
+        : (recipe.category ?? 'other').toLowerCase().replace(/\s+/g, '-')
       if (!byHub.has(hub)) byHub.set(hub, [])
       byHub.get(hub)!.push(recipe)
     }
 
-    const hubs = [...byHub.entries()].sort((a, b) => b[1].length - a[1].length)
+    // Sort by path so a child hub (keto/desserts) sits next to its parent.
+    const hubs = [...byHub.entries()].sort((a, b) => {
+      const rootA = a[0].split('/')[0]!
+      const rootB = b[0].split('/')[0]!
+      if (rootA !== rootB) {
+        const sizeA = [...byHub.entries()].filter(([k]) => k.split('/')[0] === rootA)
+          .reduce((n, [, v]) => n + v.length, 0)
+        const sizeB = [...byHub.entries()].filter(([k]) => k.split('/')[0] === rootB)
+          .reduce((n, [, v]) => n + v.length, 0)
+        return sizeB - sizeA || rootA.localeCompare(rootB)
+      }
+      return a[0].split('/').length - b[0].split('/').length || a[0].localeCompare(b[0])
+    })
     const nodes: GraphNode[] = []
-    const hubRadius = 520
+    const total = list.length || 1
 
-    hubs.forEach(([hub, members], i) => {
-      const angle = (i / hubs.length) * Math.PI * 2 - Math.PI / 2
+    // Hubs get an arc proportional to their size, so a big category is not
+    // crammed into the same wedge as a single-recipe one.
+    let cursor = -Math.PI / 2
+    const gap = 0.06
+
+    hubs.forEach(([hub, members]) => {
+      const share = (members.length / total) * (Math.PI * 2 - gap * hubs.length)
+      const angle = cursor + share / 2
+      cursor += share + gap
+
+      // Push crowded hubs further out, and child hubs further still so they
+      // orbit their parent rather than competing with it.
+      const depth = hub.split('/').length - 1
+      const hubRadius = 420 + Math.sqrt(members.length) * 105 + depth * 420
       const hx = Math.cos(angle) * hubRadius
       const hy = Math.sin(angle) * hubRadius
 
       nodes.push({
         id: `hub:${hub}`,
-        title: hub.split('-').map(w => w[0]!.toUpperCase() + w.slice(1)).join(' '),
+        // Only the last segment: the parent is carried by the edge, so a child
+        // hub reads as "Desserts" hanging off "Keto".
+        title: hub
+          .split('/')
+          .pop()!
+          .split('-')
+          .map(w => w[0]!.toUpperCase() + w.slice(1))
+          .join(' '),
         category: hub,
         tags: [],
         x: hx,
         y: hy,
         r: 11 + Math.min(members.length, 14),
-        kind: 'hub'
+        kind: 'hub',
+        count: members.length
       })
 
       // Fan the members outward from the hub, in rings so dense hubs stay legible.
-      const perRing = 8
+      const perRing = 6
       members.forEach((recipe, j) => {
         const ring = Math.floor(j / perRing)
         const slot = j % perRing
         const count = Math.min(perRing, members.length - ring * perRing)
-        const spread = Math.PI * 0.7
+        const spread = Math.min(Math.PI * 0.9, Math.max(share * 1.1, 0.5))
         const step = count > 1 ? spread / (count - 1) : 0
-        const a = angle - spread / 2 + slot * step
-        const dist = 165 + ring * 86
+        const a = angle - spread / 2 + slot * step + (ring % 2 ? step / 2 : 0)
+        const dist = 200 + ring * 130
 
         nodes.push({
           id: recipe.path ?? recipe.title,
@@ -80,6 +118,23 @@ export const useRecipeGraph = (recipes: Ref<RecipeMeta[]> | ComputedRef<RecipeMe
 
     const recipeNodes = nodes.filter(n => n.kind === 'recipe')
     const edges: GraphEdge[] = []
+
+    // Spokes tie each recipe back to its category hub, so the grouping reads as
+    // structure rather than as an accident of position.
+    const hubNodes = new Map(
+      nodes.filter(n => n.kind === 'hub').map(n => [n.category, n])
+    )
+    for (const node of recipeNodes) {
+      const hub = hubNodes.get(node.hub ?? '')
+      if (hub) edges.push({ a: hub, b: node, weight: 1, kind: 'spoke', shared: [] })
+    }
+
+    // A nested category hangs off its parent hub.
+    for (const [key, hub] of hubNodes) {
+      const parentKey = key.split('/').slice(0, -1).join('/')
+      const parent = parentKey ? hubNodes.get(parentKey) : null
+      if (parent) edges.push({ a: parent, b: hub, weight: 2, kind: 'spoke', shared: [] })
+    }
 
     // A tag on a dozen recipes connects everything to everything and the graph
     // turns into a hairball, so only the discriminating ones draw an edge.
