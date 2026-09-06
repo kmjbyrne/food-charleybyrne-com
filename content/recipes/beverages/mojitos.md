@@ -8,6 +8,8 @@ category: Cocktail
 
 Most cocktail jiggers are 1 & 1/2 oz measures.
 
+Where 1.5 oz roughly = 45ml, and 1 oz (small side, pony shot) roughly = 30ml.
+
 ## Ingredients
 
 - 1 & 1/2 oz rum. (2 times the larger side a cocktail jigger)

@@ -8,11 +8,12 @@ tags:
   - garlic
   - condiment
   - dip
-data:
-  ingredients:
-    - 3/4 cup mayonnaise
-    - 3 cloves garlic
-    - 2 2/1 tbsp lemon juice
-    - 1/2 tsp salt
-    - 1/2 tsp black pepper
 ---
+
+## Ingredients
+
+- 3/4 cup mayonnaise
+- 3 cloves garlic
+- 2 2/1 tbsp lemon juice
+- 1/2 tsp salt
+- 1/2 tsp black pepper

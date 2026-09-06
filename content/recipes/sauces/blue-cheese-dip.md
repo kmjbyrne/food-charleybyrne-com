@@ -1,12 +1,8 @@
 ---
 title: Blue Cheese Dip
-description: Classic blue cheese dip
+description: Blue cheese dip for wings, carrots and celery
 category: Dips
 ---
-
-Delicious blue cheese dip. Pairs well with crispy chicken wings, carrot or
-celery sticks. Best made a few hours in advance and refrigerated until serving
-time. However, tastes great made just before just the same.
 
 ## Ingredients
 
@@ -25,3 +21,8 @@ time. However, tastes great made just before just the same.
 1. Mix all ingredients together
 
 Enjoy!
+
+## Notes
+
+Best made a few hours ahead and refrigerated until serving. It tastes just as
+good made right before, though.

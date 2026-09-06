@@ -1,7 +1,7 @@
 ---
 title: Basil Caesar Dressing
-description: A herby basil dressing for caesar salad twist
-coverImage: stars.jpg
+description: Caesar dressing with basil, blitzed in one go with no anchovies
+cover: /stars.jpg
 category: Dressing
 ---
 

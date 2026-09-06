@@ -8,14 +8,15 @@ tags:
   - garlic
   - condiment
   - dip
-data:
-  ingredients:
-    - 2 large free range egg yolks
-    - 400ml (1.5 cup) cold-pressed extra virgin olive oil
-    - 1 lemon
-    - 2 clove of garlic
-    - 1/2 tsp salt
 ---
+
+## Ingredients
+
+- 2 large free range egg yolks
+- 400ml (1.5 cup) cold-pressed extra virgin olive oil
+- 1 lemon
+- 2 clove of garlic
+- 1/2 tsp salt
 
 ## Method
 

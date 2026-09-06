@@ -2,7 +2,6 @@
 title: Soy & Ginger Salmon
 description: Grilled salmon with a soy and ginger marinade
 category: Fish
-image: ADD
 tags:
   - ADD
 ---

@@ -68,26 +68,26 @@ then a fresh finish that never gets boiled.
 
 ### Build the Base
 
-3. Heat the mustard oil in a wide pan until it shimmers and the raw pungency
+1. Heat the mustard oil in a wide pan until it shimmers and the raw pungency
    burns off. Take it off the heat for 2 minutes so you do not scorch the
    aromatics.
-4. Back on medium, add the jimbu and cumin seeds and let them sizzle 15-20
+2. Back on medium, add the jimbu and cumin seeds and let them sizzle 15-20
    seconds until fragrant.
-5. Add the onions, 6 garlic cloves and 30g ginger. Fry, stirring, until deep
+3. Add the onions, 6 garlic cloves and 30g ginger. Fry, stirring, until deep
    golden, past the point that feels comfortable. With no tomato, this browning
    is the body and colour of the dish.
-6. Tip the browned mixture into a blender with the 150ml water and blitz smooth.
+4. Tip the browned mixture into a blender with the 150ml water and blitz smooth.
    Return it to the pan.
-7. Stir in the turmeric, ground cumin, ground coriander and salt, then add the
+5. Stir in the turmeric, ground cumin, ground coriander and salt, then add the
    chicken. Simmer uncovered 15-20 minutes, stirring now and then, until the
    chicken is cooked through and the sauce has thickened and gone glossy.
 
 ### Finish Off the Heat
 
-8. Blend the soaked cashews smooth with a splash of their water and stir in,
+1. Blend the soaked cashews smooth with a splash of their water and stir in,
    followed by the cream. Turn the heat low, stir through the reserved green
    paste and the timur, and warm 1-2 minutes only. Do not boil it green.
-9. Off the heat, stir in the lemon juice. Taste for salt and lemon, and serve.
+2. Off the heat, stir in the lemon juice. Taste for salt and lemon, and serve.
 
 ## Notes
 

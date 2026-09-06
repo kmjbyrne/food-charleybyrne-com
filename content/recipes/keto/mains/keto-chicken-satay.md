@@ -6,6 +6,7 @@ tags:
   - keto
   - chicken
   - satay
+  - asian
 keto: true
 ---
 
@@ -33,4 +34,7 @@ keto: true
 - 2 tsp sweetener
 - 2 tbsp soy sauce
 - 1 tbsp lime juice
+- 1 tbsp fish sauce
 - 1/4 cup water
+
+Garnish with chopped spring onions and sliced chillies.

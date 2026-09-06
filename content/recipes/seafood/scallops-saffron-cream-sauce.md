@@ -2,7 +2,6 @@
 title: Cream Roe & Saffron Scallops
 description: Pan fried scallops in a creamy roe and saffron sauce
 category: Seafood
-image: ADD
 tags:
   - seafood
   - scallops

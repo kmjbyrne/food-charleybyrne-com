@@ -70,29 +70,29 @@ close but flat.
 
 ### Build the Base
 
-3. Heat the mustard oil in the open cooker until it shimmers and the raw
+1. Heat the mustard oil in the open cooker until it shimmers and the raw
    pungency burns off. It will smoke lightly. Take it off the heat for 2 minutes
    so you do not scorch the aromatics.
-4. Back on medium, add the jimbu and cumin seeds and let them sizzle 15-20
+2. Back on medium, add the jimbu and cumin seeds and let them sizzle 15-20
    seconds until fragrant.
-5. Add the onions, 6 garlic cloves and 30g ginger. Fry, stirring, until deep
+3. Add the onions, 6 garlic cloves and 30g ginger. Fry, stirring, until deep
    golden, past the point that feels comfortable. With no tomato, this browning
    is where the body and colour come from. Do not rush it.
-6. Tip the browned mixture into a blender with the 150ml water and blitz smooth.
+4. Tip the browned mixture into a blender with the 150ml water and blitz smooth.
    Return it to the cooker.
-7. Stir in the turmeric, ground cumin, ground coriander and salt, then add the
+5. Stir in the turmeric, ground cumin, ground coriander and salt, then add the
    lamb. Keep it looser than you want the final sauce, nothing evaporates under
    pressure. Lock the lid, high pressure 25 minutes, then natural release for
    about 10 minutes.
 
 ### Finish Off the Heat
 
-8. Open up and simmer uncovered until the sauce thickens and turns glossy. This
+1. Open up and simmer uncovered until the sauce thickens and turns glossy. This
    reduction is where it stops looking like stew.
-9. Blend the soaked cashews smooth with a splash of their water and stir in,
+2. Blend the soaked cashews smooth with a splash of their water and stir in,
    followed by the cream. Turn the heat low, stir through the reserved green
    paste and the timur, and warm 1-2 minutes only. Do not boil it green.
-10. Off the heat, stir in the lemon juice. Taste for salt and lemon, and serve.
+3. Off the heat, stir in the lemon juice. Taste for salt and lemon, and serve.
 
 ## Notes
 
