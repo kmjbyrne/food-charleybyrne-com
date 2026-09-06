@@ -13,7 +13,9 @@ servings: 20
 difficulty: Medium
 ---
 
-Bones, mirepoix and time. The pressure cooker does in three hours what an open pot needs eight or nine to do. Reduce the strained stock until it coats a spoon and sets firm when cold, then freeze it in cubes. One cube makes a sauce.
+Bones, mirepoix and time. The pressure cooker does in three hours what an open pot needs eight or nine to do. Reduce the strained stock until it coats a spoon and sets firm when cold.
+
+Classically it is kept in the fridge, where it holds a week or two as a firm jelly. I freeze mine in an ice cube tray instead, which means one cube is one sauce and there is always some in the house.
 
 ## Ingredients
 
@@ -36,11 +38,12 @@ Bones, mirepoix and time. The pressure cooker does in three hours what an open p
 5. Add the herbs and peppercorns, cover with water, and pressure cook 3 hours.
 6. Strain through a fine sieve, then again through muslin. Chill overnight and lift off the fat.
 7. Reduce the strained stock over medium heat until it is syrupy and coats a spoon heavily. Expect to lose four fifths of the volume.
-8. Pour into an ice cube tray and freeze. Each cube is roughly one sauce.
+8. Refrigerate in a sealed container, or pour into an ice cube tray and freeze. A cube is roughly one sauce.
 
 ## Notes
 
 - Do not salt it. This reduces to a fifth of its volume, so anything you season now becomes inedible later.
 - It should set to a firm jelly when cold. If it stays loose, it needs more reduction.
+- Refrigerated it keeps a week or two. Frozen it keeps for months, which is why I portion it into cubes.
 - The same method makes a :nuxt-link{to="/stocks/chicken-stock"}[chicken stock], but at two hours rather than three.
 - Vinegar in the deglaze helps draw gelatin from the bones and keeps the finished glace from tasting flat.

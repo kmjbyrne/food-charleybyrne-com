@@ -5,8 +5,6 @@ category: Mains
 components:
   - recipe: /recipes/sauces/pepper-sauce
     label: Pepper Sauce
-  - recipe: /recipes/stocks/glace-de-viande
-    label: Glace de Viande
 tags:
   - steak
   - beef
@@ -19,15 +17,23 @@ servings: 2
 difficulty: Medium
 ---
 
-Three things happen in order, and only the last two are quick. The glace is made weeks ahead and lives in the freezer. The steak goes in the bath in the morning. The sear and the sauce take fifteen minutes between them.
+Two things happen on the day. The steak goes in the bath in the morning, then the sear and the sauce take about fifteen minutes between them.
+
+The glace de viande is a prerequisite rather than a step, made well in advance. I freeze mine in cubes so there is always some to hand.
 
 ## Ingredients
+
+### Steak
 
 - 1 côte de boeuf, 800g to 1kg, bone in
 - 1 tbsp neutral oil, high smoke point
 - 30g butter
 - Flaky salt
 - Black pepper
+
+### Sauce
+
+:sub-recipe{path="/recipes/sauces/pepper-sauce" section="Ingredients" label="Pepper sauce"}
 
 ## Method
 
