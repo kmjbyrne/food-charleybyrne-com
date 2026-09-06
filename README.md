@@ -1,4 +1,4 @@
-# Mise
+# Food
 
 A personal recipe collection, published as a static site.
 
