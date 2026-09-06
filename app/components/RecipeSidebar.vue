@@ -234,7 +234,7 @@ const openTag = (tag: string) => {
 
   <div
     v-if="recent.length && isRecipePage"
-    class="hidden md:flex fixed top-24 z-30 flex-col gap-1.5 pointer-events-none"
+    class="hidden min-[1400px]:flex fixed top-24 z-30 flex-col gap-1.5 pointer-events-none"
     :class="open ? 'left-[300px]' : 'left-0'"
     style="transition: left 250ms ease"
   >

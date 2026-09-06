@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { RecipeMeta } from '~/types/recipe'
+import type { RecipeMeta, RecipeVariantGroup } from '~/types/recipe'
 
 definePageMeta({})
 
@@ -87,10 +87,23 @@ const onProseClick = (e: MouseEvent) => {
   const target = e.target as HTMLElement
   if (target.closest('a')) return
 
+  const switcher = target.closest('.variant-switch') as HTMLElement | null
+  if (switcher) {
+    const group = switcher.dataset.variantGroup ?? ''
+    if (openSwitcher.value === group) {
+      openSwitcher.value = null
+      return
+    }
+    const box = switcher.getBoundingClientRect()
+    switcherPos.value = { top: `${box.bottom + 6}px`, left: `${box.left - 8}px` }
+    openSwitcher.value = group
+    return
+  }
+
   const heading = target.closest('.recipe-prose h2, .recipe-prose h3')
-  // anchor clicks are handled above; everything else toggles the section
   if (heading) {
     heading.classList.toggle('collapsed')
+    setCollapsed(heading, heading.classList.contains('collapsed'))
     return
   }
 
@@ -98,6 +111,296 @@ const onProseClick = (e: MouseEvent) => {
   if (li && !li.querySelector('ul, ol')) {
     li.classList.toggle('checked')
     persistChecks()
+  }
+}
+
+const copied = ref(false)
+const cardOpen = ref(false)
+
+const onCardKey = (e: KeyboardEvent) => {
+  if (e.key === 'Escape') cardOpen.value = false
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', onCardKey)
+  onBeforeUnmount(() => window.removeEventListener('keydown', onCardKey))
+})
+
+watch(cardOpen, (open) => {
+  document.body.style.overflow = open ? 'hidden' : ''
+})
+
+// The card mirrors the current selection, so it reads from the rendered prose.
+const cardSections = ref<{ heading: string, items: string[], steps: string[] }[]>([])
+
+const buildCard = () => {
+  if (!prose.value) return
+  const hidden = (el: Element) =>
+    el.hasAttribute('data-collapsed')
+    || el.hasAttribute('data-variant-hidden')
+    || el.hasAttribute('data-scope-hidden')
+
+  const text = (el: Element) => {
+    const clone = el.cloneNode(true) as HTMLElement
+    clone.querySelectorAll('ul, ol, button, svg').forEach(n => n.remove())
+    return (clone.textContent ?? '').replace(/\s+/g, ' ').trim()
+  }
+
+  const out: { heading: string, items: string[], steps: string[] }[] = []
+  let current: { heading: string, items: string[], steps: string[] } | null = null
+
+  for (const node of prose.value.children) {
+    if (hidden(node)) continue
+    if (/^H[23]$/.test(node.tagName)) {
+      const label = text(node)
+      if (!label) continue
+      current = { heading: label, items: [], steps: [] }
+      out.push(current)
+      continue
+    }
+    if (!current) continue
+    if (node.tagName === 'UL') {
+      for (const li of node.querySelectorAll(':scope > li')) {
+        if (!hidden(li) && text(li)) current.items.push(text(li))
+      }
+    } else if (node.tagName === 'OL') {
+      for (const li of node.querySelectorAll(':scope > li')) {
+        if (!hidden(li) && text(li)) current.steps.push(text(li))
+      }
+    }
+  }
+  cardSections.value = out.filter(s => s.items.length || s.steps.length)
+}
+
+const openCard = () => {
+  buildCard()
+  cardOpen.value = true
+}
+
+// Copies what is on screen, so the scale and chosen variants come with it.
+const copyRecipe = async () => {
+  if (!prose.value) return
+
+  const visible = (el: Element) =>
+    !el.hasAttribute('data-collapsed') && !el.hasAttribute('data-variant-hidden')
+
+  // textContent would swallow nested lists and the injected switch button, so
+  // take only this element's own text and collapse the source line wraps.
+  const ownText = (el: Element) => {
+    const clone = el.cloneNode(true) as HTMLElement
+    clone.querySelectorAll('ul, ol, button, svg').forEach(n => n.remove())
+    return (clone.textContent ?? '').replace(/\s+/g, ' ').trim()
+  }
+
+  const lines: string[] = []
+
+  const writeList = (list: Element, depth: number) => {
+    let n = 0
+    for (const li of list.querySelectorAll(':scope > li')) {
+      if (!visible(li)) continue
+      const text = ownText(li)
+      const indent = '  '.repeat(depth)
+      if (text) {
+        lines.push(list.tagName === 'OL' ? `${indent}${++n}. ${text}` : `${indent}- ${text}`)
+      }
+      for (const nested of li.querySelectorAll(':scope > ul, :scope > ol')) {
+        writeList(nested, depth + 1)
+      }
+    }
+  }
+
+  for (const node of prose.value.children) {
+    if (!visible(node)) continue
+
+    if (/^H[23]$/.test(node.tagName)) {
+      const text = ownText(node)
+      if (text) lines.push('', node.tagName === 'H2' ? `## ${text}` : `### ${text}`, '')
+      continue
+    }
+    if (node.tagName === 'UL' || node.tagName === 'OL') {
+      writeList(node, 0)
+      continue
+    }
+    if (node.tagName === 'PRE') continue
+    if (node.tagName === 'BLOCKQUOTE') {
+      const text = ownText(node)
+      if (text) lines.push('', `> ${text}`, '')
+      continue
+    }
+    const text = ownText(node)
+    if (text) lines.push('', text, '')
+  }
+
+  const header = [`# ${displayTitle.value}`]
+  if (recipe.value?.description) header.push('', recipe.value.description)
+  const meta: string[] = []
+  if (multiplier.value !== 1) meta.push(`Scaled ${multiplier.value}x`)
+  for (const group of variantGroups.value) {
+    const pick = chosen.value[group.name]
+    if (pick) meta.push(`${group.name}: ${pick}`)
+  }
+  if (meta.length) header.push('', `_${meta.join(' · ')}_`)
+
+  const body = [...header, ...lines, '', `${location.origin}${recipe.value?.path ?? ''}`]
+    .join('\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
+
+  try {
+    await navigator.clipboard.writeText(body)
+    copied.value = true
+    setTimeout(() => (copied.value = false), 2000)
+  } catch {
+    copied.value = false
+  }
+}
+
+const variantGroups = computed(() => recipe.value?.variants ?? [])
+
+// A diet-style group can qualify the title, so "Keto BBQ Sauce" reads correctly
+// without duplicating the recipe.
+const displayTitle = computed(() => {
+  const base = recipe.value?.title ?? ''
+  const group = variantGroups.value.find(g => g.titlePrefix)
+  if (!group) return base
+  const pick = chosen.value[group.name]
+  if (!pick || pick === 'Standard' || base.includes(pick)) return base
+  return `${pick} ${base}`
+})
+const chosen = ref<Record<string, string>>({})
+
+// Variant subsections share everything before them; only the chosen one shows.
+const variantOptions = (group: RecipeVariantGroup) => {
+  if (!prose.value) return [] as HTMLElement[]
+  const headings = [...prose.value.querySelectorAll('h2')]
+  const parent = headings.find(h => h.textContent?.trim() === group.section)
+  if (!parent) return []
+
+  const out: HTMLElement[] = []
+  let node = parent.nextElementSibling
+  while (node && node.tagName !== 'H2') {
+    if (node.tagName === 'H3') {
+      const label = node.textContent?.trim() ?? ''
+      const matches = !group.match || label.toLowerCase().includes(group.match.toLowerCase())
+      const scope = group.scopeBy ? chosen.value[group.scopeBy] : null
+      const inScope = !scope || label.toLowerCase().startsWith(scope.toLowerCase())
+      if (matches && inScope) out.push(node as HTMLElement)
+    }
+    node = node.nextElementSibling
+  }
+  return out
+}
+
+// Headings that belong to a diet the reader did not pick are hidden outright.
+const applyScopes = () => {
+  if (!prose.value) return
+  for (const group of variantGroups.value) {
+    if (!group.options) continue
+    const pick = chosen.value[group.name] ?? group.default ?? group.options[0]!
+    for (const heading of prose.value.querySelectorAll('h3')) {
+      const label = heading.textContent?.trim().toLowerCase() ?? ''
+      const owner = group.options.find(o => label.startsWith(o.toLowerCase()))
+      if (!owner) continue
+      const active = owner === pick
+      heading.toggleAttribute('data-scope-hidden', !active)
+      let node = heading.nextElementSibling
+      while (node && !['H2', 'H3'].includes(node.tagName)) {
+        node.toggleAttribute('data-scope-hidden', !active)
+        node = node.nextElementSibling
+      }
+    }
+  }
+}
+
+const applyVariants = () => {
+  if (!prose.value) return
+  applyScopes()
+  for (const group of variantGroups.value) {
+    // A declared-options group (Diet) has no headings of its own; it selects
+    // which of another group's headings are eligible.
+    if (group.options) {
+      const pick = chosen.value[group.name] ?? group.default ?? group.options[0]!
+      chosen.value[group.name] = pick
+      continue
+    }
+
+    const options = variantOptions(group)
+    if (!options.length) continue
+    const labels = options.map(h => h.textContent?.trim() ?? '')
+    const wanted = chosen.value[group.name] ?? group.default
+    const pick = labels.find(l => l === wanted)
+      ?? labels.find(l => wanted && l.startsWith(wanted))
+      ?? labels[0]!
+    chosen.value[group.name] = pick
+    for (const heading of options) {
+      const active = (heading.textContent?.trim() ?? '').replace(/\s*⇄\s*$/, '') === pick
+      heading.toggleAttribute('data-variant-hidden', !active)
+      let node = heading.nextElementSibling
+      while (node && !['H2', 'H3'].includes(node.tagName)) {
+        node.toggleAttribute('data-variant-hidden', !active)
+        node = node.nextElementSibling
+      }
+    }
+  }
+}
+
+// The heading comes from rendered markdown, so its switch control is injected.
+const decorateVariantHeadings = () => {
+  if (!prose.value) return
+  for (const group of variantGroups.value) {
+    for (const heading of variantOptions(group)) {
+      if (heading.querySelector('.variant-switch')) continue
+      const btn = document.createElement('button')
+      btn.className = 'variant-switch'
+      btn.type = 'button'
+      btn.title = `Switch ${group.name.toLowerCase()}`
+      btn.dataset.variantGroup = group.name
+      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3h5v5"/><path d="M4 20 21 3"/><path d="M21 16v5h-5"/><path d="m15 15 6 6"/><path d="M4 4l5 5"/></svg>'
+      heading.appendChild(btn)
+    }
+  }
+}
+
+const openSwitcher = ref<string | null>(null)
+const switcherPos = ref<Record<string, string>>({})
+
+const variantLabels = ref<Record<string, string[]>>({})
+
+const indexVariants = () => {
+  const map: Record<string, string[]> = {}
+  for (const group of variantGroups.value) {
+    map[group.name] = group.options
+      ? [...group.options]
+      : variantOptions(group).map(h => h.textContent?.trim() ?? '')
+  }
+  variantLabels.value = map
+}
+
+const selectVariant = (group: string, option: string) => {
+  chosen.value[group] = option
+  // A scoping change invalidates the dependent group's current pick.
+  const stale = variantGroups.value.filter(g => g.scopeBy === group).map(g => g.name)
+  if (stale.length) {
+    chosen.value = Object.fromEntries(
+      Object.entries(chosen.value).filter(([k]) => !stale.includes(k))
+    )
+  }
+  applyVariants()
+  indexVariants()
+}
+
+// A section runs from its heading to the next one of the same or higher level,
+// which no CSS sibling selector can express.
+const setCollapsed = (heading: Element, hide: boolean) => {
+  const level = Number(heading.tagName[1])
+  let node = heading.nextElementSibling
+  while (node) {
+    const tag = node.tagName
+    if (/^H[1-6]$/.test(tag) && Number(tag[1]) <= level) break
+    if (hide) node.setAttribute('data-collapsed', '')
+    else node.removeAttribute('data-collapsed')
+    if (/^H[1-6]$/.test(tag)) node.classList.remove('collapsed')
+    node = node.nextElementSibling
   }
 }
 
@@ -153,11 +456,17 @@ onMounted(() => {
   labelSections()
   visit(recipe.value)
   applyScaling()
+  indexVariants()
+  decorateVariantHeadings()
+  applyVariants()
 })
 watch(slug, () => nextTick(() => {
   restoreChecks()
   labelSections()
   visit(recipe.value)
+  indexVariants()
+  decorateVariantHeadings()
+  applyVariants()
 }))
 
 const nutrition = computed(() => recipe.value?.nutrition)
@@ -194,7 +503,7 @@ const fatPct = computed(() =>
 </script>
 
 <template>
-  <div class="px-6 md:pl-56 py-8 flex justify-center gap-8">
+  <div class="px-6 py-8 flex justify-center gap-8">
     <article class="w-full max-w-[760px] flex flex-col gap-6">
       <div class="flex items-center gap-2 text-sm text-(--ui-text-muted)">
         <NuxtLink
@@ -222,7 +531,7 @@ const fatPct = computed(() =>
 
       <div class="flex flex-col gap-2">
         <h1 class="text-3xl/tight font-bold tracking-tight text-(--ui-text-highlighted)">
-          {{ recipe?.title }}
+          {{ displayTitle }}
         </h1>
         <p
           v-if="recipe?.description"
@@ -251,14 +560,53 @@ const fatPct = computed(() =>
           </NuxtLink>
         </div>
         <UButton
+          icon="i-lucide-scroll-text"
+          label="Card"
+          color="neutral"
+          variant="ghost"
+          size="sm"
+          class="shrink-0 ml-auto"
+          @click="openCard"
+        />
+        <UButton
+          :icon="copied ? 'i-lucide-check' : 'i-lucide-copy'"
+          :label="copied ? 'Copied' : 'Copy'"
+          color="neutral"
+          variant="ghost"
+          size="sm"
+          class="shrink-0"
+          @click="copyRecipe"
+        />
+        <UButton
           icon="i-lucide-chef-hat"
           label="Cook"
           color="primary"
           variant="soft"
           size="sm"
-          class="hidden md:flex shrink-0 ml-auto"
+          class="hidden md:flex shrink-0"
           @click="cookingMode = true"
         />
+      </div>
+
+      <div
+        v-for="group in variantGroups"
+        :key="group.name"
+        class="flex items-center gap-2 text-sm flex-wrap"
+      >
+        <span class="text-(--ui-text-dimmed)">{{ group.name }}</span>
+        <div class="flex rounded-lg border border-(--ui-border) overflow-hidden">
+          <button
+            v-for="option in variantLabels[group.name] ?? []"
+            :key="option"
+            class="px-2.5 py-1 text-xs font-medium transition-colors"
+            :class="chosen[group.name] === option
+              ? 'bg-primary-500 text-white'
+              : 'text-(--ui-text-muted) hover:bg-(--ui-bg-elevated)'"
+            @click="selectVariant(group.name, option)"
+          >
+            {{ option.replace(group.match ?? '', '').replace(/^[\s:.\d]+/, '') || option }}
+          </button>
+        </div>
       </div>
 
       <div
@@ -288,6 +636,12 @@ const fatPct = computed(() =>
       </div>
 
       <div
+        v-if="openSwitcher"
+        class="fixed inset-0 z-40"
+        @click="openSwitcher = null"
+      />
+
+      <div
         v-if="recipe?.body"
         ref="prose"
         class="recipe-prose"
@@ -295,6 +649,139 @@ const fatPct = computed(() =>
       >
         <ContentRenderer :value="recipe" />
       </div>
+
+      <Teleport to="body">
+        <div
+          v-if="cardOpen"
+          class="recipe-card-overlay"
+          @click.self="cardOpen = false"
+        >
+          <article class="recipe-card">
+            <header class="recipe-card-head">
+              <div>
+                <p
+                  v-if="recipe?.category"
+                  class="recipe-card-eyebrow"
+                >
+                  {{ recipe.category }}
+                </p>
+                <h1>{{ displayTitle }}</h1>
+                <p
+                  v-if="recipe?.description"
+                  class="recipe-card-desc"
+                >
+                  {{ recipe.description }}
+                </p>
+              </div>
+              <div class="recipe-card-actions">
+                <button
+                  title="Print"
+                  @click="print()"
+                >
+                  <UIcon
+                    name="i-lucide-printer"
+                    class="size-4"
+                  />
+                </button>
+                <button
+                  title="Close"
+                  @click="cardOpen = false"
+                >
+                  <UIcon
+                    name="i-lucide-x"
+                    class="size-4"
+                  />
+                </button>
+              </div>
+            </header>
+
+            <dl
+              v-if="recipe?.servings || recipe?.time || multiplier !== 1"
+              class="recipe-card-meta"
+            >
+              <div v-if="recipe?.servings">
+                <dt>Serves</dt>
+                <dd>{{ recipe.servings }}</dd>
+              </div>
+              <div v-if="recipe?.time">
+                <dt>Time</dt>
+                <dd>{{ recipe.time }} min</dd>
+              </div>
+              <div v-if="multiplier !== 1">
+                <dt>Scale</dt>
+                <dd>{{ multiplier }}&times;</dd>
+              </div>
+              <div
+                v-for="group in variantGroups"
+                :key="group.name"
+              >
+                <dt>{{ group.name }}</dt>
+                <dd>{{ chosen[group.name] }}</dd>
+              </div>
+            </dl>
+
+            <div class="recipe-card-body">
+              <section
+                v-for="section in cardSections"
+                :key="section.heading"
+              >
+                <h2>{{ section.heading }}</h2>
+                <ul v-if="section.items.length">
+                  <li
+                    v-for="item in section.items"
+                    :key="item"
+                  >
+                    {{ item }}
+                  </li>
+                </ul>
+                <ol v-if="section.steps.length">
+                  <li
+                    v-for="step in section.steps"
+                    :key="step"
+                  >
+                    {{ step }}
+                  </li>
+                </ol>
+              </section>
+            </div>
+
+            <footer class="recipe-card-foot">
+              {{ displayTitle }}
+            </footer>
+          </article>
+        </div>
+      </Teleport>
+
+      <Teleport
+        v-if="openSwitcher"
+        to="body"
+      >
+        <div
+          class="fixed z-50 min-w-44 rounded-lg border border-(--ui-border) bg-(--ui-bg) shadow-lg p-1"
+          :style="switcherPos"
+        >
+          <button
+            v-for="option in variantLabels[openSwitcher] ?? []"
+            :key="option"
+            class="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md text-[13px] text-left transition-colors"
+            :class="chosen[openSwitcher] === option
+              ? 'bg-primary-500/12 text-primary-500 font-medium'
+              : 'text-(--ui-text-muted) hover:bg-(--ui-bg-elevated) hover:text-(--ui-text)'"
+            @click="selectVariant(openSwitcher, option); openSwitcher = null"
+          >
+            <UIcon
+              v-if="chosen[openSwitcher] === option"
+              name="i-lucide-check"
+              class="size-3.5 shrink-0"
+            />
+            <span
+              v-else
+              class="size-3.5 shrink-0"
+            />
+            {{ option }}
+          </button>
+        </div>
+      </Teleport>
 
       <section
         v-if="related?.length"

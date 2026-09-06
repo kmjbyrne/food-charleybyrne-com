@@ -53,18 +53,18 @@ const icon = computed(() =>
 <template>
   <div
     v-if="art"
-    class="aspect-16/10 bg-(--ui-bg-elevated) bg-cover bg-center"
+    class="aspect-3/2 bg-(--ui-bg-elevated) bg-cover bg-center"
     :class="props.rounded ?? 'rounded-lg'"
     :style="{ backgroundImage: `url(${art})` }"
   />
   <div
     v-else
-    class="aspect-16/10 grid place-items-center bg-(--ui-bg-elevated) border border-(--ui-border)"
+    class="aspect-3/2 grid place-items-center bg-(--ui-bg-elevated) border border-(--ui-border)"
     :class="props.rounded ?? 'rounded-lg'"
   >
     <UIcon
       :name="icon"
-      class="size-8 text-(--ui-text-dimmed) opacity-60"
+      class="size-6 text-(--ui-text-dimmed) opacity-50"
     />
   </div>
 </template>

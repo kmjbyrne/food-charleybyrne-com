@@ -10,6 +10,16 @@ export interface RecipeNutrition {
   vitamins?: Record<string, number>
 }
 
+export interface RecipeVariantGroup {
+  name: string
+  section: string
+  match?: string
+  options?: string[]
+  scopeBy?: string
+  titlePrefix?: boolean
+  default?: string
+}
+
 export interface RecipeMeta {
   path: string
   stem: string
@@ -18,6 +28,7 @@ export interface RecipeMeta {
   category?: string
   tags?: string[]
   image?: string
+  variants?: RecipeVariantGroup[]
   cover?: string
   diet?: Record<string, boolean>
   keto?: boolean
