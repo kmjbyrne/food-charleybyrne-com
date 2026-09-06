@@ -40,6 +40,7 @@ export interface RecipeMeta {
   inherits?: string
   inheritsSection?: string
   substitutes?: { from: string, to: string, note?: string }[]
+  components?: { recipe: string, label?: string }[]
   motherSauce?: boolean
   time?: number
   prep?: number

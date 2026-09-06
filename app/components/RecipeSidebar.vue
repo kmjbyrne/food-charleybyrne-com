@@ -22,6 +22,13 @@ const isRecipePage = computed(() => route.meta.isRecipe === true)
 
 const { expand } = useCategoryExpansion()
 
+const surpriseMe = async () => {
+  const list = props.allRecipes
+  if (!list.length) return
+  const pick = list[Math.floor(Math.random() * list.length)]
+  if (pick?.path) await router.push(recipeUrl(pick.path))
+}
+
 onMounted(() => {
   loadRecent()
   if (activeCategory.value) expand(activeCategory.value)
@@ -93,6 +100,17 @@ const openTag = (tag: string) => {
       v-show="open"
       class="fixed md:sticky top-14 left-0 z-35 w-[300px] h-[calc(100vh-3.5rem)] flex flex-col overflow-y-auto border-r border-(--ui-border) bg-(--ui-bg-muted) px-3 py-4 gap-4"
     >
+      <button
+        class="sm:hidden flex items-center gap-2.5 px-2.5 py-2 rounded-md text-sm font-medium text-(--ui-text-muted) border border-(--ui-border) hover:text-(--ui-text) hover:border-primary-500 transition-colors"
+        @click="surpriseMe"
+      >
+        <UIcon
+          name="i-lucide-dices"
+          class="size-4 shrink-0"
+        />
+        Surprise me
+      </button>
+
       <div class="flex flex-col gap-1.5">
         <p class="text-[11px] font-semibold uppercase tracking-widest text-(--ui-text-dimmed) px-2 pb-1 flex items-center justify-between">
           Categories

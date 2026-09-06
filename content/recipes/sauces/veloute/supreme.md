@@ -2,6 +2,7 @@
 title: Suprême
 links:
   - /recipes/sauces/veloute
+inherits: /recipes/sauces/veloute
 description:
   Chicken velouté finished with cream and mushroom, the richest of its line
 category: Sauces
@@ -22,7 +23,6 @@ chicken.
 
 ## Ingredients
 
-- 500ml chicken velouté
 - 100g mushroom trimmings or stalks
 - 150ml double cream
 - 30g cold butter, cubed

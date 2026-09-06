@@ -11,6 +11,17 @@ const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 const { search } = useRecipeFilters()
+
+const { data: allPaths } = await useAsyncData('all-paths', () =>
+  queryCollection('recipes').select('path').all()
+)
+
+const surpriseMe = async () => {
+  const list = allPaths.value ?? []
+  if (!list.length) return
+  const pick = list[Math.floor(Math.random() * list.length)]
+  if (pick?.path) await navigateTo(recipeUrl(pick.path))
+}
 const colorMode = useColorMode()
 
 const { palette, apply: applyPalette, load: loadPalette } = usePalette()
@@ -113,6 +124,17 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
         />
       </button>
     </div>
+
+    <UButton
+      icon="i-lucide-dices"
+      color="neutral"
+      variant="ghost"
+      size="sm"
+      class="hidden sm:flex shrink-0"
+      aria-label="Pick a random recipe"
+      title="Pick a random recipe"
+      @click="surpriseMe"
+    />
 
     <div class="flex items-center gap-1 ml-auto shrink-0">
       <UButton

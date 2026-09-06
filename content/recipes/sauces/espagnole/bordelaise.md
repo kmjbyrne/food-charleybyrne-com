@@ -2,6 +2,7 @@
 title: Bordelaise
 links:
   - /recipes/sauces/espagnole
+inherits: /recipes/sauces/espagnole
 description:
   Espagnole reduced with red wine, shallot and marrow, for grilled beef
 category: Sauces
@@ -24,7 +25,6 @@ with poached marrow. The traditional sauce for a grilled steak.
 - 300ml dry red wine
 - 2 shallots, finely chopped
 - 1 sprig thyme, 1 bay leaf
-- 400ml espagnole or demi-glace
 - 60g beef marrow, diced
 - 30g cold butter
 - Salt and pepper

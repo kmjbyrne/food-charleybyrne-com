@@ -867,3 +867,38 @@
 body.card-open > #__nuxt {
   content-visibility: hidden;
 }
+
+/* An ingredient pulled from a parent recipe, marked where it sits. */
+.recipe-prose li[data-inherited] {
+  color: var(--ui-text-muted);
+}
+
+.recipe-prose li[data-inherited]::before {
+  display: none;
+}
+
+.inherited-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+  border-radius: 4px;
+  color: var(--ui-primary);
+  background: color-mix(in srgb, var(--ui-primary) 12%, transparent);
+  transition: background 0.15s;
+}
+
+.inherited-mark:hover {
+  background: color-mix(in srgb, var(--ui-primary) 25%, transparent);
+}
+
+.inherited-mark svg {
+  width: 0.625rem;
+  height: 0.625rem;
+}
+
+.recipe-prose li[data-inherited] s {
+  opacity: 0.5;
+}

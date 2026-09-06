@@ -54,7 +54,7 @@ it behaves the same in a lasagne or a croque monsieur.
 
 ## Method
 
-### Classic
+### Classic Method
 
 1. Melt the butter in a heavy pan over medium-low heat.
 2. Stir in the flour and cook 2 to 3 minutes to a white roux. It should bubble
@@ -65,7 +65,7 @@ it behaves the same in a lasagne or a croque monsieur.
    coats a spoon.
 5. Remove the bay leaf. Season with nutmeg, salt and white pepper.
 
-### Keto
+### Keto Method
 
 1. Melt the butter and cream cheese together in a small pan over medium heat,
    whisking until smooth.

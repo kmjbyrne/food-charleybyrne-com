@@ -3,6 +3,7 @@ title: Béarnaise
 links:
   - /recipes/sauces/hollandaise
 inherits: /recipes/sauces/hollandaise
+inheritsSection: Sauce
 substitutes:
   - from: lemon juice
     to: tarragon and shallot reduction

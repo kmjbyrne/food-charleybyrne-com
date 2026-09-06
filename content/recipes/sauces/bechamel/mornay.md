@@ -2,6 +2,7 @@
 title: Mornay
 links:
   - /recipes/sauces/bechamel
+inherits: /recipes/sauces/bechamel
 description:
   Bechamel enriched with gruyere and parmesan, the classic cheese sauce
 category: Sauces
@@ -21,7 +22,6 @@ monsieur, gratins and anything you want to brown under a grill.
 
 ## Ingredients
 
-- 500ml bechamel, warm
 - 60g gruyere, grated
 - 30g parmesan, grated
 - 1 egg yolk, optional

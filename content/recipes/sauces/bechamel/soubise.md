@@ -2,6 +2,7 @@
 title: Soubise
 links:
   - /recipes/sauces/bechamel
+inherits: /recipes/sauces/bechamel
 description:
   Onion sauce in two forms, the classical bechamel version and a simpler one
   built on cream alone
@@ -35,7 +36,6 @@ without splitting.
 
 ### Classical, on bechamel
 
-- 500ml bechamel, warm
 - 2 large onions, finely sliced
 - 30g butter
 - 50ml cream, optional

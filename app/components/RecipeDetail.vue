@@ -135,7 +135,41 @@ const goToCategory = (category: string) => {
   navigateTo(`/${category.toLowerCase()}`)
 }
 
-const tocLinks = computed(() => recipe.value?.body?.toc?.links ?? [])
+// The table of contents comes from the parsed markdown, so it needs the same
+// variant filtering the rendered page gets.
+const tocLinks = computed(() => {
+  const links = recipe.value?.body?.toc?.links ?? []
+  const groups = recipe.value?.variants ?? []
+  if (!groups.length) return links
+
+  const hidden = (text: string) => {
+    const label = text.trim().toLowerCase()
+    for (const group of groups) {
+      const pick = chosen.value[group.name]
+      if (!pick) continue
+
+      const options = group.options ?? []
+      const owner = options.find(o => label.startsWith(o.toLowerCase()))
+      if (owner) return owner !== pick
+
+      if (group.match && label.includes(group.match.toLowerCase())) {
+        return !label.includes(pick.toLowerCase())
+      }
+    }
+    return false
+  }
+
+  type TocLink = typeof links[number]
+
+  const prune = (list: TocLink[]): TocLink[] =>
+    list
+      .filter(link => !hidden(link.text))
+      .map(link => (link.children
+        ? { ...link, children: prune(link.children) }
+        : link))
+
+  return prune(links)
+})
 
 // Most recipes are just Ingredients + Method; a two-item TOC is noise.
 const showToc = computed(() => tocLinks.value.length >= 3)
@@ -448,6 +482,26 @@ const { data: parents } = await useAsyncData(
 
 const motherOf = computed(() => parents.value?.find(p => p.motherSauce) ?? null)
 
+// A composite recipe is assembled from others that each stand alone, so the
+// parts are pulled in whole rather than copied.
+const { data: components } = await useAsyncData(
+  () => `components-${slug.value}`,
+  async () => {
+    const parts = recipe.value?.components ?? []
+    if (!parts.length) return []
+    const all = await queryCollection('recipes')
+      .select('path', 'title', 'description', 'time', 'servings')
+      .all()
+    return parts
+      .map(part => ({
+        label: part.label,
+        recipe: all.find(r => r.path === part.recipe) ?? null
+      }))
+      .filter(p => p.recipe)
+  },
+  { watch: [slug] }
+)
+
 // A derivative can pull its base ingredients from the recipe it inherits, so
 // changing the mother updates every daughter.
 const { data: inherited } = await useAsyncData(
@@ -665,6 +719,7 @@ const selectVariant = (group: string, option: string) => {
   applyVariants()
   indexVariants()
   syncQuery()
+  nextTick(injectInherited)
 }
 
 // A section runs from its heading to the next one of the same or higher level,
@@ -683,6 +738,62 @@ const setCollapsed = (heading: Element, hide: boolean) => {
 }
 
 // Collapsed headings show what they are hiding.
+// Inherited items belong inside the section they extend, marked as coming from
+// the parent, rather than sitting in a panel of their own.
+const injectInherited = () => {
+  if (!prose.value || !inherited.value) return
+  const named = recipe.value?.inheritsSection?.toLowerCase()
+
+  // Prefer the named section, then the conventional one, then the first visible
+  // ingredient list. Hidden variant sections are skipped so the base lands in
+  // the one the reader is actually looking at.
+  const visible = (el: Element) =>
+    !el.hasAttribute('data-variant-hidden') && !el.hasAttribute('data-scope-hidden')
+
+  const headings = [...prose.value.querySelectorAll('h2, h3, h4')].filter(visible)
+  const label = (h: Element) => (h.textContent ?? '').trim().toLowerCase()
+
+  const heading = (named && headings.find(h => label(h) === named))
+    ?? headings.find(h => label(h) === 'added to the base')
+    ?? headings.find(h => label(h).startsWith('added to'))
+    ?? headings.find(h => h.tagName !== 'H2' && h.closest('.recipe-prose') && (() => {
+      let n = h.nextElementSibling
+      while (n && !['UL', 'OL', 'H2', 'H3', 'H4'].includes(n.tagName)) n = n.nextElementSibling
+      return n?.tagName === 'UL'
+    })())
+    ?? headings.find(h => label(h) === 'ingredients')
+
+  {
+    if (!heading) return
+    let list = heading.nextElementSibling
+    while (list && !['UL', 'OL'].includes(list.tagName)) list = list.nextElementSibling
+    if (!list || list.querySelector('[data-inherited]')) return
+
+    for (const row of [...inherited.value.rows].reverse()) {
+      const li = document.createElement('li')
+      li.setAttribute('data-inherited', '')
+      li.title = row.swap
+        ? `Replaces "${row.text}" from ${inherited.value.title}`
+        : `From ${inherited.value.title}`
+
+      const link = document.createElement('a')
+      link.href = recipeUrl(inherited.value.path)
+      link.className = 'inherited-mark'
+      link.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>'
+
+      const text = document.createElement('span')
+      if (row.swap) {
+        text.innerHTML = `<s>${row.text}</s> <b>${row.swap.to}</b>`
+      } else {
+        text.textContent = row.text
+      }
+
+      li.append(link, text)
+      list.prepend(li)
+    }
+  }
+}
+
 const labelSections = () => {
   if (!prose.value) return
   const headings = prose.value.querySelectorAll('h2, h3')
@@ -731,6 +842,9 @@ watch(multiplier, () => {
   applyScaling()
   syncQuery()
 })
+
+// The parent's ingredients arrive asynchronously, so inject once they land.
+watch(inherited, () => nextTick(injectInherited), { immediate: true })
 
 onMounted(() => {
   restoreChecks()
@@ -1000,11 +1114,11 @@ const fatPct = computed(() =>
         </div>
       </div>
 
-      <div
+      <details
         v-if="inherited?.items.length"
         class="rounded-lg border border-(--ui-border) bg-(--ui-bg-muted) overflow-hidden"
       >
-        <p class="px-3.5 py-2 text-[11px] font-semibold uppercase tracking-widest text-(--ui-text-dimmed) border-b border-(--ui-border) flex items-center gap-1.5">
+        <summary class="px-3.5 py-2 text-[11px] font-semibold uppercase tracking-widest text-(--ui-text-dimmed) flex items-center gap-1.5 cursor-pointer select-none hover:text-(--ui-text)">
           <UIcon
             name="i-lucide-link"
             class="size-3"
@@ -1014,7 +1128,7 @@ const fatPct = computed(() =>
             :to="recipeUrl(inherited.path)"
             class="normal-case tracking-normal font-medium text-primary-500 hover:underline"
           >{{ inherited.title }}</NuxtLink>
-        </p>
+        </summary>
         <ul class="px-3.5 py-2.5 flex flex-col gap-1.5">
           <li
             v-for="row in inherited.rows"
@@ -1041,6 +1155,37 @@ const fatPct = computed(() =>
             <span v-else>{{ row.text }}</span>
           </li>
         </ul>
+      </details>
+
+      <div
+        v-if="components?.length"
+        class="flex flex-col gap-2"
+      >
+        <p class="text-[11px] font-semibold uppercase tracking-widest text-(--ui-text-dimmed)">
+          Made from
+        </p>
+        <div class="grid gap-2 sm:grid-cols-2">
+          <NuxtLink
+            v-for="part in components"
+            :key="part.recipe!.path"
+            :to="recipeUrl(part.recipe!.path)"
+            class="group flex items-start gap-2.5 p-3 rounded-lg border border-(--ui-border) bg-(--ui-bg) hover:border-primary-500 transition-colors"
+          >
+            <UIcon
+              name="i-lucide-puzzle"
+              class="size-4 shrink-0 mt-0.5 text-(--ui-text-dimmed) group-hover:text-primary-500"
+            />
+            <span class="min-w-0">
+              <span class="block text-[13px] font-semibold text-(--ui-text-highlighted) truncate">
+                {{ part.label ?? part.recipe!.title }}
+              </span>
+              <span
+                v-if="part.recipe!.time"
+                class="block text-[11px] text-(--ui-text-dimmed) mt-0.5"
+              >{{ formatDuration(part.recipe!.time) }}</span>
+            </span>
+          </NuxtLink>
+        </div>
       </div>
 
       <div
@@ -1226,7 +1371,7 @@ const fatPct = computed(() =>
       <UContentToc
         :links="tocLinks"
         highlight
-        highlight-variant="circuit"
+        highlight-variant="straight"
         class="sticky top-20"
       />
     </aside>
