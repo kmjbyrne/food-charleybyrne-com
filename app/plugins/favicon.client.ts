@@ -1,5 +1,8 @@
-// A rotating favicon: the tab cycles through dishes while the page is open.
+// The tab icon rotates through the set on each load, so a fresh visit gets a
+// different dish rather than the icon animating in place.
 const EMOJI = ['🍲', '🥐', '🍜', '🥗', '🍰', '🌶️', '🧄', '🥖', '🍳', '🫕']
+
+const KEY = 'favicon-index'
 
 const svgFor = (glyph: string) =>
   `data:image/svg+xml,${encodeURIComponent(
@@ -7,21 +10,18 @@ const svgFor = (glyph: string) =>
   )}`
 
 export default defineNuxtPlugin(() => {
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-
   const link = document.querySelector<HTMLLinkElement>('link[rel="icon"]')
   if (!link) return
 
-  const original = link.href
-  let i = 0
+  const pick = () => {
+    try {
+      const next = (Number(localStorage.getItem(KEY) ?? -1) + 1) % EMOJI.length
+      localStorage.setItem(KEY, String(next))
+      return next
+    } catch {
+      return Math.floor(Math.random() * EMOJI.length)
+    }
+  }
 
-  const timer = setInterval(() => {
-    i = (i + 1) % EMOJI.length
-    link.href = svgFor(EMOJI[i]!)
-  }, 3000)
-
-  window.addEventListener('beforeunload', () => {
-    clearInterval(timer)
-    link.href = original
-  })
+  link.href = svgFor(EMOJI[pick()]!)
 })
