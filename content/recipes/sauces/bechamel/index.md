@@ -1,5 +1,7 @@
 ---
 title: Simple Bechamel Sauce
+index: true
+motherSauce: true
 paths:
   - sauces/cooking
 description: Basic version of one of the simplest mother sauces
@@ -24,3 +26,9 @@ Typical ratio:
 - 1 cup (70g) parmesan
 - 1 tsp salt and white pepper
 - 1 bay leaf
+
+## Derivatives
+
+Mornay adds gruyere and parmesan. Soubise adds sweated onion, passed smooth.
+Nantua adds crayfish butter and cream. Cheddar cheese sauce is the domestic
+cousin of Mornay.

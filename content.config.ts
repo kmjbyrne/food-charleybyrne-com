@@ -42,6 +42,8 @@ export default defineContentConfig({
         keto: z.boolean().optional(),
         paths: z.array(z.string()).optional(),
         links: z.array(z.string()).optional(),
+        index: z.boolean().optional(),
+        motherSauce: z.boolean().optional(),
         diet: z.record(z.boolean()).optional(),
         time: z.number().optional(),
         prep: z.number().optional(),

@@ -397,6 +397,18 @@ const copyRecipe = async () => {
   }
 }
 
+// A mother sauce lists what derives from it, pulled from the sibling files.
+const { data: derivatives } = await useAsyncData(
+  () => `derivatives-${slug.value}`,
+  () => (recipe.value?.motherSauce
+    ? queryCollection('recipes')
+        .where('path', 'LIKE', `${slug.value}/%`)
+        .select('path', 'title', 'description')
+        .all()
+    : Promise.resolve([])),
+  { watch: [slug] }
+)
+
 const variantGroups = computed(() => recipe.value?.variants ?? [])
 
 // Restore the selection a shared link carried: ?infusion=ginger
@@ -831,6 +843,37 @@ const fatPct = computed(() =>
         class="fixed inset-0 z-40"
         @click="openSwitcher = null"
       />
+
+      <div
+        v-if="recipe?.motherSauce"
+        class="flex items-start gap-3 p-3.5 rounded-lg border border-primary-500/25 bg-primary-500/8"
+      >
+        <UIcon
+          name="i-lucide-git-fork"
+          class="size-4 shrink-0 mt-0.5 text-primary-500"
+        />
+        <div class="min-w-0">
+          <p class="text-[13px] font-semibold text-(--ui-text-highlighted)">
+            One of the five French mother sauces
+          </p>
+          <p class="text-[13px] text-(--ui-text-muted) mt-0.5">
+            Everything below derives from this base.
+          </p>
+          <div
+            v-if="derivatives?.length"
+            class="flex flex-wrap gap-1.5 mt-2"
+          >
+            <NuxtLink
+              v-for="d in derivatives"
+              :key="d.path"
+              :to="recipeUrl(d.path)"
+              class="text-[11px] px-2 py-0.5 rounded-full bg-(--ui-bg) border border-(--ui-border) text-(--ui-text-muted) hover:border-primary-500 hover:text-primary-500 transition-colors"
+            >
+              {{ d.title }}
+            </NuxtLink>
+          </div>
+        </div>
+      </div>
 
       <div
         v-if="recipe?.body"

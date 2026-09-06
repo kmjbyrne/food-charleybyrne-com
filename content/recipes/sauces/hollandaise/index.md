@@ -1,5 +1,7 @@
 ---
 title: Hollandaise Sauce
+index: true
+motherSauce: true
 paths:
   - sauces/cooking
 description:
@@ -41,3 +43,9 @@ liberal amount of whisking.
 4. Incorporate the butter in several stages, slowly but whisking vigorously
 5. Once the mixture has thickened and all butter is incorporated, remove bowl
 6. Lightly season with salt and pepper or optionally paprika
+
+## Derivatives
+
+Bearnaise swaps the lemon for a tarragon and shallot reduction. Choron adds
+tomato to bearnaise. Maltaise uses blood orange. Mousseline folds in whipped
+cream.

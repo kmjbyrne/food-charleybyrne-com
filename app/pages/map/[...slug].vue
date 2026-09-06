@@ -29,12 +29,15 @@ const active = computed(() => {
   const key = path.replace('/recipes/', '')
   return graph.value.nodes.find(n => n.id === path)
     ?? graph.value.nodes.find(n => n.id === `hub:${key}`)
+    ?? graph.value.nodes.find(n => n.recipePath === path)
     ?? null
 })
 
 const select = (node: GraphNode | null) => {
   if (!node) return router.push('/map')
-  const target = node.kind === 'hub' ? `/map/${node.category}` : `/map${recipeUrl(node.id)}`
+  const target = node.kind === 'hub'
+    ? `/map/${node.category}`
+    : `/map${recipeUrl(node.id)}`
   return router.push(target)
 }
 
@@ -59,8 +62,8 @@ const expanded = ref(false)
 
 const { data: full } = await useAsyncData(
   () => `map-full-${selectedPath.value}`,
-  () => (expanded.value && selectedPath.value
-    ? queryCollection('recipes').path(selectedPath.value).first()
+  () => (expanded.value && (active.value?.recipePath ?? selectedPath.value)
+    ? queryCollection('recipes').path(active.value?.recipePath ?? selectedPath.value).first()
     : Promise.resolve(null)),
   { watch: [selectedPath, expanded] }
 )
@@ -78,7 +81,8 @@ const onDrawerKey = (e: KeyboardEvent) => {
 const detail = computed(() => {
   const node = active.value
   if (!node) return null
-  return recipes.value.find(r => r.path === node.id) ?? null
+  const path = node.recipePath ?? node.id
+  return recipes.value.find(r => r.path === path) ?? null
 })
 
 // A hub's drawer lists its child categories and the recipes it holds.
@@ -516,11 +520,22 @@ useSeoMeta({
           </div>
 
           <UButton
-            :to="`/${active.category}`"
-            icon="i-lucide-arrow-right"
+            v-if="detail"
+            icon="i-lucide-maximize-2"
             trailing
             color="primary"
             variant="soft"
+            size="sm"
+            label="Open recipe"
+            block
+            @click="expanded = true"
+          />
+          <UButton
+            :to="`/${active.category}`"
+            icon="i-lucide-arrow-right"
+            trailing
+            color="neutral"
+            variant="subtle"
             size="sm"
             label="Browse category"
             block

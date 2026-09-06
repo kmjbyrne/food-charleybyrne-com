@@ -9,13 +9,15 @@ interface Props {
 
 const props = defineProps<Props>()
 
+const { open, toggle } = useCategoryExpansion()
+
 const isActive = computed(() => props.active === props.node.path)
 const isAncestor = computed(() =>
   props.active.startsWith(`${props.node.path}/`)
 )
 
 const hasChildren = computed(() => props.node.children.length > 0)
-const isExpanded = computed(() => isActive.value || isAncestor.value)
+const isExpanded = computed(() => open.value[props.node.path] ?? isAncestor.value)
 </script>
 
 <template>
@@ -39,12 +41,18 @@ const isExpanded = computed(() => isActive.value || isAncestor.value)
         :class="depth ? 'opacity-60' : ''"
       />
       <span class="flex-1 text-left truncate">{{ node.label }}</span>
-      <UIcon
+      <button
         v-if="hasChildren"
-        name="i-lucide-chevron-right"
-        class="size-3 shrink-0 text-(--ui-text-dimmed) transition-transform"
-        :class="isExpanded ? 'rotate-90' : ''"
-      />
+        class="shrink-0 -mr-1 p-0.5 rounded hover:bg-(--ui-bg-accented) transition-colors"
+        :aria-label="isExpanded ? 'Collapse' : 'Expand'"
+        @click.prevent.stop="toggle(node.path)"
+      >
+        <UIcon
+          name="i-lucide-chevron-right"
+          class="size-3 text-(--ui-text-dimmed) transition-transform"
+          :class="isExpanded ? 'rotate-90' : ''"
+        />
+      </button>
       <span
         class="text-xs font-medium px-1.5 py-0.5 rounded-full"
         :class="isActive ? 'bg-(--ui-bg) text-primary-500' : 'bg-(--ui-bg-elevated) text-(--ui-text-dimmed)'"
@@ -52,7 +60,7 @@ const isExpanded = computed(() => isActive.value || isAncestor.value)
     </NuxtLink>
 
     <ul
-      v-if="node.children.length && (isActive || isAncestor)"
+      v-if="hasChildren && isExpanded"
       class="flex flex-col gap-0.5 mt-0.5"
     >
       <CategoryTreeItem

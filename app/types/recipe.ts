@@ -34,6 +34,8 @@ export interface RecipeMeta {
   keto?: boolean
   paths?: string[]
   links?: string[]
+  index?: boolean
+  motherSauce?: boolean
   time?: number
   prep?: number
   cook?: number

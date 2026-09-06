@@ -1,5 +1,7 @@
 ---
 title: Keto Bechamel Sauce
+links:
+  - /recipes/sauces/bechamel/bechamel
 paths:
   - sauces/cooking
   - keto/sauces

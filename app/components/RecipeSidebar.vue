@@ -20,7 +20,16 @@ const { recent, load: loadRecent, clear: clearRecent } = useRecentRecipes()
 // The tabs sit over the content column, which only has room on a detail page.
 const isRecipePage = computed(() => route.meta.isRecipe === true)
 
-onMounted(loadRecent)
+const { expand } = useCategoryExpansion()
+
+onMounted(() => {
+  loadRecent()
+  if (activeCategory.value) expand(activeCategory.value)
+})
+
+watch(activeCategory, (path) => {
+  if (path) expand(path)
+})
 const router = useRouter()
 const route = useRoute()
 

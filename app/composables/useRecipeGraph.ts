@@ -11,6 +11,7 @@ export interface GraphNode {
   kind: 'hub' | 'recipe'
   hub?: string
   count?: number
+  recipePath?: string
 }
 
 export interface GraphEdge {
@@ -36,7 +37,9 @@ export const useRecipeGraph = (recipes: Ref<RecipeMeta[]> | ComputedRef<RecipeMe
         ? dirs.join('/')
         : (recipe.category ?? 'other').toLowerCase().replace(/\s+/g, '-')
       if (!byHub.has(hub)) byHub.set(hub, [])
-      byHub.get(hub)!.push(recipe)
+      // The index.md of a directory is the hub itself, not one of its members.
+      const key = (recipe.path ?? '').replace('/recipes/', '')
+      if (key !== hub) byHub.get(hub)!.push(recipe)
     }
 
     // Sort by path so a child hub (keto/desserts) sits next to its parent.
@@ -72,8 +75,12 @@ export const useRecipeGraph = (recipes: Ref<RecipeMeta[]> | ComputedRef<RecipeMe
       const hx = Math.cos(angle) * hubRadius
       const hy = Math.sin(angle) * hubRadius
 
+      // A directory with an index.md is both a category and a recipe, so the
+      // hub carries that recipe's path and opens it directly.
+      const self = list.find(r => r.path === `/recipes/${hub}`)
+
       nodes.push({
-        id: `hub:${hub}`,
+        id: self?.path ?? `hub:${hub}`,
         // Only the last segment: the parent is carried by the edge, so a child
         // hub reads as "Desserts" hanging off "Keto".
         title: hub
@@ -88,7 +95,8 @@ export const useRecipeGraph = (recipes: Ref<RecipeMeta[]> | ComputedRef<RecipeMe
         y: hy,
         r: 11 + Math.min(members.length, 14),
         kind: 'hub',
-        count: members.length
+        count: members.length,
+        recipePath: self?.path
       })
 
       // Fan the members outward from the hub, in rings so dense hubs stay legible.

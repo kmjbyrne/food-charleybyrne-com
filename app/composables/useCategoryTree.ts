@@ -24,7 +24,12 @@ const ICONS: Record<string, string> = {
   condiments: 'i-lucide-flask-round',
   marinades: 'i-lucide-flask-conical',
   pastes: 'i-lucide-blend',
-  keto: 'i-lucide-leaf'
+  keto: 'i-lucide-leaf',
+  bechamel: 'i-lucide-milk',
+  hollandaise: 'i-lucide-egg',
+  veloute: 'i-lucide-soup',
+  espagnole: 'i-lucide-beef',
+  tomat: 'i-lucide-cherry'
 }
 
 const toLabel = (slug: string) =>
@@ -43,16 +48,35 @@ export const useCategoryTree = (
   computed<CategoryNode[]>(() => {
     const roots: CategoryNode[] = []
 
+    // A directory with an index.md is a category in its own right, so its own
+    // path counts as a node rather than resolving to its parent.
+    const indexPaths = new Set(
+      recipes.value
+        .map(r => (r.path ?? '').replace(/^\/recipes\//, ''))
+        .filter(Boolean)
+    )
+
     // A recipe lives where its file sits, and optionally in extra facet paths
     // (keto/sauces), so the same dish appears under both.
     const placements = (recipe: RecipeMeta) => {
-      const own = (recipe.path ?? '').split('/').filter(Boolean).slice(1, -1)
+      const segs = (recipe.path ?? '').split('/').filter(Boolean).slice(1)
+      const isIndex = segs.some((_, i) => i < segs.length - 1
+        && indexPaths.has(segs.slice(0, i + 1).join('/')))
+      const own = segs.slice(0, -1)
       const extra = (recipe.paths ?? []).map(p => p.split('/').filter(Boolean))
-      return own.length || extra.length ? [own, ...extra].filter(p => p.length) : []
+      const all = [own, ...extra].filter(p => p.length)
+      return isIndex || all.length ? all : []
     }
 
     for (const recipe of recipes.value) {
-      for (const segments of placements(recipe)) {
+      const key = (recipe.path ?? '').replace(/^\/recipes\//, '')
+      // An index.md is a category even when nothing else sits beside it yet.
+      const ownsDir = Boolean(recipe.index)
+        || recipes.value.some(other => (other.path ?? '').startsWith(`/recipes/${key}/`))
+      const spots = placements(recipe)
+      if (ownsDir) spots.unshift(key.split('/').filter(Boolean))
+
+      for (const segments of spots) {
         let siblings = roots
         const trail: string[] = []
 

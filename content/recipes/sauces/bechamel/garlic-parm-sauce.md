@@ -1,5 +1,7 @@
 ---
 title: Garlic Parmesan Sauce
+links:
+  - /recipes/sauces/bechamel/bechamel
 paths:
   - sauces/cooking
 description: Creamy garlic and parmesan sauce built on a beef stock base
