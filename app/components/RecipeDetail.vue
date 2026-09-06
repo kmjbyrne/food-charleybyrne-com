@@ -58,6 +58,8 @@ const stepList = computed(() => collectList('ol'))
 
 // A diet-style group can qualify the title, so "Keto BBQ Sauce" reads correctly
 // without duplicating the recipe.
+const variantGroups = computed(() => recipe.value?.variants ?? [])
+
 const displayTitle = computed(() => {
   const base = recipe.value?.title ?? ''
   const group = variantGroups.value.find(g => g.titlePrefix)
@@ -302,10 +304,8 @@ const onCardKey = (e: KeyboardEvent) => {
   if (e.key === 'Escape') cardOpen.value = false
 }
 
-onMounted(() => {
-  window.addEventListener('keydown', onCardKey)
-  onBeforeUnmount(() => window.removeEventListener('keydown', onCardKey))
-})
+onMounted(() => window.addEventListener('keydown', onCardKey))
+onBeforeUnmount(() => window.removeEventListener('keydown', onCardKey))
 
 watch(cardOpen, (open) => {
   document.body.style.overflow = open ? 'hidden' : ''
@@ -517,8 +517,6 @@ const { data: components } = useAsyncData(
   },
   { watch: [slug] }
 )
-
-const variantGroups = computed(() => recipe.value?.variants ?? [])
 
 // Seed the selection from the route before anything reads it. Query params and
 // path segments are slugs, so they resolve back to the option's own label.

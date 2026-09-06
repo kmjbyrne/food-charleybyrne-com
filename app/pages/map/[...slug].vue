@@ -355,18 +355,24 @@ const pickTag = (tag: string) => {
   draw()
 }
 
+let sizeWatch: ResizeObserver | null = null
+let themeWatch: MutationObserver | null = null
+
 onMounted(() => {
   draw()
   window.addEventListener('keydown', onDrawerKey)
-  onBeforeUnmount(() => window.removeEventListener('keydown', onDrawerKey))
-  const observer = new ResizeObserver(draw)
-  if (canvas.value) observer.observe(canvas.value)
-  const themeWatch = new MutationObserver(draw)
+
+  sizeWatch = new ResizeObserver(draw)
+  if (canvas.value) sizeWatch.observe(canvas.value)
+
+  themeWatch = new MutationObserver(draw)
   themeWatch.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
-  onBeforeUnmount(() => {
-    observer.disconnect()
-    themeWatch.disconnect()
-  })
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('keydown', onDrawerKey)
+  sizeWatch?.disconnect()
+  themeWatch?.disconnect()
 })
 
 watch([graph, active], draw)

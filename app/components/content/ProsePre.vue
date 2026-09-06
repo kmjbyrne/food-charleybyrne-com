@@ -33,15 +33,18 @@ const onKey = (e: KeyboardEvent) => {
   if (e.key === 'Escape') expanded.value = false
 }
 
+let observer: MutationObserver | null = null
+
 onMounted(() => {
   render()
-  const observer = new MutationObserver(render)
+  observer = new MutationObserver(render)
   observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
   window.addEventListener('keydown', onKey)
-  onBeforeUnmount(() => {
-    observer.disconnect()
-    window.removeEventListener('keydown', onKey)
-  })
+})
+
+onBeforeUnmount(() => {
+  observer?.disconnect()
+  window.removeEventListener('keydown', onKey)
 })
 
 watch(expanded, (open) => {
