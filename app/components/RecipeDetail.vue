@@ -511,6 +511,7 @@ const { data: components } = useAsyncData(
     return parts
       .map(part => ({
         label: part.label,
+        ahead: part.ahead ?? false,
         recipe: all.find(r => r.path === part.recipe) ?? null
       }))
       .filter(p => p.recipe)
@@ -1031,17 +1032,17 @@ const fatPct = computed(() =>
             class="group flex items-start gap-2.5 p-3 rounded-lg border border-(--ui-border) bg-(--ui-bg) hover:border-primary-500 transition-colors"
           >
             <UIcon
-              name="i-lucide-puzzle"
+              :name="part.ahead ? 'i-lucide-archive' : 'i-lucide-puzzle'"
               class="size-4 shrink-0 mt-0.5 text-(--ui-text-dimmed) group-hover:text-primary-500"
             />
             <span class="min-w-0">
               <span class="block text-[13px] font-semibold text-(--ui-text-highlighted) truncate">
                 {{ part.label ?? part.recipe!.title }}
               </span>
-              <span
-                v-if="part.recipe!.time"
-                class="block text-[11px] text-(--ui-text-dimmed) mt-0.5"
-              >{{ formatDuration(part.recipe!.time) }}</span>
+              <span class="block text-[11px] text-(--ui-text-dimmed) mt-0.5">
+                <template v-if="part.ahead">Made ahead</template>
+                <template v-else-if="part.recipe!.time">{{ formatDuration(part.recipe!.time) }}</template>
+              </span>
             </span>
           </NuxtLink>
         </div>

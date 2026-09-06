@@ -50,7 +50,11 @@ export default defineContentConfig({
         inheritsVariant: z.string().optional(),
         inheritsWhen: z.record(z.string()).optional(),
         components: z
-          .array(z.object({ recipe: z.string(), label: z.string().optional() }))
+          .array(z.object({
+            recipe: z.string(),
+            label: z.string().optional(),
+            ahead: z.boolean().optional()
+          }))
           .optional(),
         substitutes: z
           .array(z.object({ from: z.string(), to: z.string(), note: z.string().optional() }))

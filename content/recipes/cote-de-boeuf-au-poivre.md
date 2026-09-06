@@ -5,6 +5,9 @@ category: Mains
 components:
   - recipe: /recipes/sauces/pepper-sauce
     label: Pepper Sauce
+  - recipe: /recipes/stocks/glace-de-viande
+    label: Glace de Viande
+    ahead: true
 tags:
   - steak
   - beef

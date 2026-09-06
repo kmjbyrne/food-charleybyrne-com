@@ -42,7 +42,7 @@ export interface RecipeMeta {
   inheritsVariant?: string
   inheritsWhen?: Record<string, string>
   substitutes?: { from: string, to: string, note?: string }[]
-  components?: { recipe: string, label?: string }[]
+  components?: { recipe: string, label?: string, ahead?: boolean }[]
   motherSauce?: boolean
   time?: number
   prep?: number
