@@ -826,9 +826,14 @@
 }
 
 @page {
-  margin: 14mm;
+  size: A4;
+  margin: 12mm;
 }
 
+/*
+ * The card is sized to fall on one A4 sheet: tighter type, ingredients in
+ * columns rather than one long run, and nothing allowed to break mid-section.
+ */
 @media print {
   body > *:not(.recipe-card-overlay) {
     display: none !important;
@@ -848,18 +853,81 @@
     border: 0;
     border-radius: 0;
     box-shadow: none;
+    font-size: 9.5pt;
+    line-height: 1.35;
   }
 
   .recipe-card-actions {
     display: none;
   }
 
-  .recipe-card-body section {
-    break-inside: avoid;
+  .recipe-card-head {
+    padding-bottom: 0.5rem;
+    border-bottom-width: 1.5px;
+  }
+
+  .recipe-card-head h1 {
+    font-size: 17pt;
+  }
+
+  .recipe-card-desc {
+    font-size: 9pt;
+    margin-top: 0.2rem;
+  }
+
+  .recipe-card-meta {
+    gap: 1.1rem;
+    margin-top: 0.6rem;
+    padding-bottom: 0.6rem;
+  }
+
+  .recipe-card-meta dd {
+    font-size: 9.5pt;
   }
 
   .recipe-card-meta div:has(dd:empty) {
     display: none;
+  }
+
+  .recipe-card-body {
+    gap: 0.85rem;
+    margin-top: 0.85rem;
+  }
+
+  .recipe-card-body h2 {
+    font-size: 7.5pt;
+    margin-bottom: 0.3rem;
+  }
+
+  .recipe-card-body ul,
+  .recipe-card-body ol {
+    font-size: 9.5pt;
+    line-height: 1.35;
+    gap: 0.12rem;
+  }
+
+  /* Ingredients read down columns, which is where most of the height goes. */
+  .recipe-card-body ul {
+    columns: 2;
+    column-gap: 1.5rem;
+  }
+
+  .recipe-card-body ul li {
+    break-inside: avoid;
+  }
+
+  .recipe-card-body ol {
+    gap: 0.3rem;
+  }
+
+  .recipe-card-body section {
+    break-inside: avoid;
+  }
+
+  .recipe-card-foot {
+    margin-top: 0.85rem;
+    padding-top: 0.5rem;
+    font-size: 7pt;
   }
 }
 
