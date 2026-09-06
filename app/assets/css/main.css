@@ -803,6 +803,10 @@
   color: var(--ui-text-dimmed);
 }
 
+@page {
+  margin: 14mm;
+}
+
 @media print {
   body > *:not(.recipe-card-overlay) {
     display: none !important;

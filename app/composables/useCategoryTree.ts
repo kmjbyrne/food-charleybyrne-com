@@ -32,36 +32,57 @@ const toLabel = (slug: string) =>
 
 // The directory tree under content/recipes is the category hierarchy, so the
 // nav stays honest when files move.
-export const useCategoryTree = (recipes: Ref<RecipeMeta[]> | ComputedRef<RecipeMeta[]>) =>
+export type CategorySort = 'alpha' | 'count'
+
+export const useCategorySort = () => useState<CategorySort>('category-sort', () => 'alpha')
+
+export const useCategoryTree = (
+  recipes: Ref<RecipeMeta[]> | ComputedRef<RecipeMeta[]>,
+  order?: Ref<CategorySort>
+) =>
   computed<CategoryNode[]>(() => {
     const roots: CategoryNode[] = []
 
-    for (const recipe of recipes.value) {
-      const segments = (recipe.path ?? '').split('/').filter(Boolean).slice(1, -1)
-      let siblings = roots
-      const trail: string[] = []
+    // A recipe lives where its file sits, and optionally in extra facet paths
+    // (keto/sauces), so the same dish appears under both.
+    const placements = (recipe: RecipeMeta) => {
+      const own = (recipe.path ?? '').split('/').filter(Boolean).slice(1, -1)
+      const extra = (recipe.paths ?? []).map(p => p.split('/').filter(Boolean))
+      return own.length || extra.length ? [own, ...extra].filter(p => p.length) : []
+    }
 
-      for (const slug of segments) {
-        trail.push(slug)
-        let node = siblings.find(n => n.slug === slug)
-        if (!node) {
-          node = {
-            slug,
-            path: trail.join('/'),
-            label: toLabel(slug),
-            icon: ICONS[slug] ?? 'i-lucide-folder',
-            count: 0,
-            children: []
+    for (const recipe of recipes.value) {
+      for (const segments of placements(recipe)) {
+        let siblings = roots
+        const trail: string[] = []
+
+        for (const slug of segments) {
+          trail.push(slug)
+          let node = siblings.find(n => n.slug === slug)
+          if (!node) {
+            node = {
+              slug,
+              path: trail.join('/'),
+              label: toLabel(slug),
+              icon: ICONS[slug] ?? 'i-lucide-folder',
+              count: 0,
+              children: []
+            }
+            siblings.push(node)
           }
-          siblings.push(node)
+          node.count++
+          siblings = node.children
         }
-        node.count++
-        siblings = node.children
       }
     }
 
+    const by = order?.value ?? 'alpha'
     const sort = (nodes: CategoryNode[]): CategoryNode[] => {
-      nodes.sort((a, b) => b.count - a.count || a.label.localeCompare(b.label))
+      nodes.sort((a, b) =>
+        by === 'count'
+          ? b.count - a.count || a.label.localeCompare(b.label)
+          : a.label.localeCompare(b.label)
+      )
       nodes.forEach(n => sort(n.children))
       return nodes
     }

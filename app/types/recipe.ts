@@ -32,6 +32,7 @@ export interface RecipeMeta {
   cover?: string
   diet?: Record<string, boolean>
   keto?: boolean
+  paths?: string[]
   time?: number
   prep?: number
   cook?: number

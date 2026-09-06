@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ComponentPublicInstance } from 'vue'
 import { useRecipeContent } from '~/composables/useRecipeContent'
 
 interface Props {
@@ -278,7 +279,7 @@ const goToStep = (index: number) => {
                 <div
                   v-for="(step, i) in content.steps"
                   :ref="
-                    (el) => {
+                    (el: Element | ComponentPublicInstance | null) => {
                       if (el) stepRefs[i] = el as HTMLElement;
                     }
                   "

@@ -25,7 +25,12 @@ const router = useRouter()
 const route = useRoute()
 
 const allRef = computed(() => props.allRecipes)
-const tree = useCategoryTree(allRef)
+const sortBy = useCategorySort()
+const tree = useCategoryTree(allRef, sortBy)
+
+const toggleSort = () => {
+  sortBy.value = sortBy.value === 'alpha' ? 'count' : 'alpha'
+}
 const tagCounts = computed(() => {
   const map: Record<string, number> = {}
   for (const r of props.allRecipes) {
@@ -80,8 +85,18 @@ const openTag = (tag: string) => {
       class="fixed md:sticky top-14 left-0 z-35 w-[300px] h-[calc(100vh-3.5rem)] flex flex-col overflow-y-auto border-r border-(--ui-border) bg-(--ui-bg-muted) px-3 py-4 gap-4"
     >
       <div class="flex flex-col gap-1.5">
-        <p class="text-[11px] font-semibold uppercase tracking-widest text-(--ui-text-dimmed) px-2 pb-1">
+        <p class="text-[11px] font-semibold uppercase tracking-widest text-(--ui-text-dimmed) px-2 pb-1 flex items-center justify-between">
           Categories
+          <button
+            class="flex items-center gap-1 font-medium tracking-normal normal-case hover:text-(--ui-text) transition-colors"
+            :title="sortBy === 'alpha' ? 'Sort by count' : 'Sort A to Z'"
+            @click="toggleSort"
+          >
+            <UIcon
+              :name="sortBy === 'alpha' ? 'i-lucide-arrow-down-a-z' : 'i-lucide-arrow-down-1-0'"
+              class="size-3.5"
+            />
+          </button>
         </p>
         <ul class="flex flex-col gap-0.5">
           <li>

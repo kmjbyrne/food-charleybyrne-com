@@ -26,9 +26,103 @@ const { data: related } = await useAsyncData(`related-${slug.value}`, () =>
     .all()
 )
 
+// Structured data must render server-side, so it reads the parsed body rather
+// than the DOM.
+const flatten = (node: unknown): string => {
+  if (typeof node === 'string') return node
+  if (!Array.isArray(node)) return ''
+  return node.slice(2).map(flatten).join('')
+}
+
+const collectList = (tag: 'ul' | 'ol'): string[] => {
+  const body = recipe.value?.body as { value?: unknown[] } | undefined
+  const out: string[] = []
+  const walk = (node: unknown) => {
+    if (!Array.isArray(node)) return
+    if (node[0] === tag) {
+      for (const child of node.slice(2)) {
+        if (Array.isArray(child) && child[0] === 'li') {
+          const text = flatten(child).replace(/\s+/g, ' ').trim()
+          if (text) out.push(text)
+        }
+      }
+      return
+    }
+    node.slice(2).forEach(walk)
+  }
+  ;(body?.value ?? []).forEach(walk)
+  return out
+}
+
+const ingredientList = computed(() => collectList('ul'))
+const stepList = computed(() => collectList('ol'))
+
+const site = 'https://food.charleybyrne.com'
+const canonical = computed(() => `${site}${recipe.value?.path ?? ''}`)
+
 useSeoMeta({
-  title: () => `${recipe.value?.title}`,
-  description: () => recipe.value?.description ?? ''
+  title: () => recipe.value?.title ?? '',
+  description: () => recipe.value?.description ?? '',
+  ogTitle: () => recipe.value?.title ?? '',
+  ogDescription: () => recipe.value?.description ?? '',
+  ogType: 'article',
+  ogUrl: () => canonical.value,
+  ogImage: () => (useRecipeArt(recipe.value) ? `${site}${useRecipeArt(recipe.value)}` : undefined),
+  twitterCard: 'summary_large_image'
+})
+
+useHead({
+  link: [{ rel: 'canonical', href: canonical }]
+})
+
+// Recipe structured data is what earns rich results: time, yield and nutrition
+// shown directly in search.
+const minutes = (n?: number) => (n ? `PT${n}M` : undefined)
+
+const jsonLd = computed(() => {
+  const r = recipe.value
+  if (!r) return null
+  const art = useRecipeArt(r)
+  const n = r.nutrition
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Recipe',
+    'name': r.title,
+    'description': r.description,
+    'url': canonical.value,
+    'image': art ? `${site}${art}` : undefined,
+    'recipeCategory': r.category,
+    'keywords': r.tags?.join(', '),
+    'recipeYield': r.servings ? `${r.servings} servings` : undefined,
+    'prepTime': minutes(r.prep),
+    'cookTime': minutes(r.cook),
+    'totalTime': minutes(r.time ?? (((r.prep ?? 0) + (r.cook ?? 0)) || undefined)),
+    'recipeIngredient': ingredientList.value,
+    'recipeInstructions': stepList.value.map((text, i) => ({
+      '@type': 'HowToStep',
+      'position': i + 1,
+      text
+    })),
+    'nutrition': n?.calories
+      ? {
+          '@type': 'NutritionInformation',
+          'calories': `${n.calories} calories`,
+          'proteinContent': n.protein ? `${n.protein} g` : undefined,
+          'fatContent': n.fat?.saturated ? `${n.fat.saturated} g` : undefined,
+          'fiberContent': n.carbs?.fiber ? `${n.carbs.fiber} g` : undefined,
+          'sodiumContent': n.sodium ? `${n.sodium} mg` : undefined
+        }
+      : undefined
+  }
+})
+
+useHead({
+  script: [
+    {
+      type: 'application/ld+json',
+      innerHTML: computed(() => (jsonLd.value ? JSON.stringify(jsonLd.value) : ''))
+    }
+  ]
 })
 
 const cookingMode = ref(false)
@@ -115,6 +209,15 @@ const onProseClick = (e: MouseEvent) => {
 }
 
 const copied = ref(false)
+
+// ContentRenderer may wrap the rendered markdown, so locate the element that
+// actually holds the headings rather than assuming a depth.
+const proseBlocks = (): Element[] => {
+  const root = prose.value
+  if (!root) return []
+  const holder = root.querySelector('h1, h2, h3')?.parentElement ?? root
+  return [...holder.children]
+}
 const cardOpen = ref(false)
 
 const onCardKey = (e: KeyboardEvent) => {
@@ -149,7 +252,7 @@ const buildCard = () => {
   const out: { heading: string, items: string[], steps: string[] }[] = []
   let current: { heading: string, items: string[], steps: string[] } | null = null
 
-  for (const node of prose.value.children) {
+  for (const node of proseBlocks()) {
     if (hidden(node)) continue
     if (/^H[23]$/.test(node.tagName)) {
       const label = text(node)
@@ -175,6 +278,12 @@ const buildCard = () => {
 const openCard = () => {
   buildCard()
   cardOpen.value = true
+}
+
+// Not window.print directly: the template resolves bare names against the
+// component instance, and this page also renders on the server.
+const printCard = () => {
+  if (import.meta.client) window.print()
 }
 
 // Copies what is on screen, so the scale and chosen variants come with it.
@@ -209,7 +318,7 @@ const copyRecipe = async () => {
     }
   }
 
-  for (const node of prose.value.children) {
+  for (const node of proseBlocks()) {
     if (!visible(node)) continue
 
     if (/^H[23]$/.test(node.tagName)) {
@@ -264,8 +373,17 @@ const displayTitle = computed(() => {
   const group = variantGroups.value.find(g => g.titlePrefix)
   if (!group) return base
   const pick = chosen.value[group.name]
-  if (!pick || pick === 'Standard' || base.includes(pick)) return base
-  return `${pick} ${base}`
+  if (!pick) return base
+
+  // The canonical title may already carry a diet word; swap it for the choice
+  // rather than stacking a second one in front.
+  const others = (group.options ?? []).filter(o => o !== pick)
+  const carried = others.find(o => new RegExp(`\\b${o}\\b`, 'i').test(base))
+  if (carried) {
+    return base.replace(new RegExp(`\\s*\\b${carried}\\b`, 'i'), pick === 'Standard' ? '' : ` ${pick}`).replace(/\s+/g, ' ').trim()
+  }
+  if (base.toLowerCase().includes(pick.toLowerCase())) return base
+  return pick === 'Standard' ? base : `${pick} ${base}`
 })
 const chosen = ref<Record<string, string>>({})
 
@@ -676,7 +794,7 @@ const fatPct = computed(() =>
               <div class="recipe-card-actions">
                 <button
                   title="Print"
-                  @click="print()"
+                  @click="printCard()"
                 >
                   <UIcon
                     name="i-lucide-printer"

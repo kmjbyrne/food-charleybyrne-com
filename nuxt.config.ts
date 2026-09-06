@@ -9,7 +9,7 @@ export default defineNuxtConfig({
     head: {
       link: [
         { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
-        { rel: 'alternate icon', href: '/favicon.ico' }
+        { rel: 'shortcut icon', href: '/favicon.ico' }
       ]
     }
   },
@@ -17,10 +17,12 @@ export default defineNuxtConfig({
   css: ['~/assets/css/main.css'],
 
   content: {
+    // Headings toggle their section open/closed, so no anchor links.
+    renderer: {
+      anchorLinks: false
+    },
     build: {
       markdown: {
-        // Headings toggle their section open/closed, so no anchor links.
-        anchorLinks: false,
         highlight: {
           theme: 'github-dark'
         }

@@ -37,9 +37,13 @@ export const useRecipeFilters = () => {
   return { search, activeCategory, activeTag, categoryPath }
 }
 
-// A category is a directory path, so a parent includes everything beneath it.
-export const inCategory = (r: RecipeMeta, path: string) =>
-  (r.path ?? '').toLowerCase().startsWith(`/recipes/${path.toLowerCase()}/`)
+// A category is a path, and a recipe can sit at several: its own directory plus
+// any facet paths declared in frontmatter.
+export const inCategory = (r: RecipeMeta, path: string) => {
+  const needle = path.toLowerCase()
+  if ((r.path ?? '').toLowerCase().startsWith(`/recipes/${needle}/`)) return true
+  return (r.paths ?? []).some(p => `${p.toLowerCase()}/`.startsWith(`${needle}/`))
+}
 
 export const useRecipeList = () => {
   const { search, activeCategory, activeTag } = useRecipeFilters()

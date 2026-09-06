@@ -22,6 +22,6 @@ function hashTitle(title: string): number {
 }
 
 export const useRecipeColor = (title: string): string => {
-  const [a, b, c] = PALETTES[hashTitle(title) % PALETTES.length]
+  const [a, b, c] = PALETTES[hashTitle(title) % PALETTES.length]!
   return `linear-gradient(135deg, ${a}, ${b} 60%, ${c})`
 }
