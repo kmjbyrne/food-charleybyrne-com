@@ -115,6 +115,24 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
     </div>
 
     <div class="flex items-center gap-1 ml-auto shrink-0">
+      <UButton
+        to="/map"
+        icon="i-lucide-git-fork"
+        color="neutral"
+        variant="ghost"
+        size="sm"
+        aria-label="Recipe map"
+        title="Recipe map"
+      />
+      <UButton
+        to="/techniques"
+        icon="i-lucide-book-open"
+        color="neutral"
+        variant="ghost"
+        size="sm"
+        aria-label="Techniques"
+        title="Techniques"
+      />
       <UPopover>
         <UButton
           :icon="schemeIcon"

@@ -7,6 +7,9 @@ interface Props {
 
 const props = defineProps<Props>()
 
+const route = useRoute()
+const router = useRouter()
+
 const recipe = computed(() => props.recipe)
 const slug = computed(() => recipe.value?.path ?? '')
 
@@ -202,6 +205,30 @@ const onProseClick = (e: MouseEvent) => {
 }
 
 const copied = ref(false)
+const linkCopied = ref(false)
+
+// A shared link should open on the same variant and scale the sender was
+// looking at, so both ride along as query params.
+const shareUrl = computed(() => {
+  const query = new URLSearchParams()
+  if (multiplier.value !== 1) query.set('scale', String(multiplier.value))
+  for (const group of variantGroups.value) {
+    const pick = chosen.value[group.name]
+    if (pick && pick !== group.default) query.set(`v.${group.name}`, pick)
+  }
+  const qs = query.toString()
+  return `${location.origin}${recipeUrl(recipe.value?.path)}${qs ? `?${qs}` : ''}`
+})
+
+const copyLink = async () => {
+  try {
+    await navigator.clipboard.writeText(shareUrl.value)
+    linkCopied.value = true
+    setTimeout(() => (linkCopied.value = false), 2000)
+  } catch {
+    linkCopied.value = false
+  }
+}
 
 // ContentRenderer may wrap the rendered markdown, so locate the element that
 // actually holds the headings rather than assuming a depth.
@@ -378,7 +405,13 @@ const displayTitle = computed(() => {
   if (base.toLowerCase().includes(pick.toLowerCase())) return base
   return pick === 'Standard' ? base : `${pick} ${base}`
 })
-const chosen = ref<Record<string, string>>({})
+const chosen = ref<Record<string, string>>(
+  Object.fromEntries(
+    Object.entries(route.query)
+      .filter(([k]) => k.startsWith('v.'))
+      .map(([k, v]) => [k.slice(2), String(v)])
+  )
+)
 
 // Variant subsections share everything before them; only the chosen one shows.
 const variantOptions = (group: RecipeVariantGroup) => {
@@ -487,6 +520,16 @@ const indexVariants = () => {
   variantLabels.value = map
 }
 
+const syncQuery = () => {
+  const query: Record<string, string> = {}
+  if (multiplier.value !== 1) query.scale = String(multiplier.value)
+  for (const g of variantGroups.value) {
+    const pick = chosen.value[g.name]
+    if (pick && pick !== g.default) query[`v.${g.name}`] = pick
+  }
+  router.replace({ query })
+}
+
 const selectVariant = (group: string, option: string) => {
   chosen.value[group] = option
   // A scoping change invalidates the dependent group's current pick.
@@ -498,6 +541,7 @@ const selectVariant = (group: string, option: string) => {
   }
   applyVariants()
   indexVariants()
+  syncQuery()
 }
 
 // A section runs from its heading to the next one of the same or higher level,
@@ -535,7 +579,7 @@ const labelSections = () => {
 
 const { visit } = useRecentRecipes()
 
-const multiplier = ref(1)
+const multiplier = ref(Number(route.query.scale) || 1)
 const SCALES = [0.5, 1, 2, 3]
 
 // Ingredient lists only; method steps must never be rewritten.
@@ -560,7 +604,10 @@ const applyScaling = () => {
   }
 }
 
-watch(multiplier, () => applyScaling())
+watch(multiplier, () => {
+  applyScaling()
+  syncQuery()
+})
 
 onMounted(() => {
   restoreChecks()
@@ -671,12 +718,22 @@ const fatPct = computed(() =>
           </NuxtLink>
         </div>
         <UButton
+          :icon="linkCopied ? 'i-lucide-check' : 'i-lucide-link'"
+          :label="linkCopied ? 'Copied' : 'Link'"
+          color="neutral"
+          variant="ghost"
+          size="sm"
+          class="shrink-0 ml-auto"
+          :title="shareUrl"
+          @click="copyLink"
+        />
+        <UButton
           icon="i-lucide-scroll-text"
           label="Card"
           color="neutral"
           variant="ghost"
           size="sm"
-          class="shrink-0 ml-auto"
+          class="shrink-0"
           @click="openCard"
         />
         <UButton
@@ -816,7 +873,7 @@ const fatPct = computed(() =>
               </div>
               <div v-if="recipe?.time">
                 <dt>Time</dt>
-                <dd>{{ recipe.time }} min</dd>
+                <dd>{{ formatDuration(recipe.time) }}</dd>
               </div>
               <div v-if="multiplier !== 1">
                 <dt>Scale</dt>
