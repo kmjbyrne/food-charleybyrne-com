@@ -217,7 +217,8 @@ const shareUrl = computed(() => {
     if (pick && pick !== group.default) query.set(`v.${group.name}`, pick)
   }
   const qs = query.toString()
-  return `${location.origin}${recipeUrl(recipe.value?.path)}${qs ? `?${qs}` : ''}`
+  const origin = import.meta.client ? location.origin : site
+  return `${origin}${recipeUrl(recipe.value?.path)}${qs ? `?${qs}` : ''}`
 })
 
 const copyLink = async () => {

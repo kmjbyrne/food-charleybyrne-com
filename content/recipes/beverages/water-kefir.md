@@ -4,7 +4,7 @@ description:
   Three stage water kefir, from ferment through overnight infusion to bottle
   carbonation
 category: Beverages
-time: 2160
+time: 5040
 servings: 8
 variants:
   - name: Infusion
@@ -30,9 +30,6 @@ tags:
 
 - Stevia to back sweeten, optional
 
-For the X1 infusion, pick one of the options below. It is optional; skip it for
-plain kefir.
-
 ## Method
 
 ### Stage 1, Ferment
@@ -47,14 +44,12 @@ plain kefir.
 
 ### Stage 2, Infuse
 
-1. Optional. Add an infusion to the strained liquid, choosing from the variants
-   below. Skip this and the kefir is plain and clean, which is a fine drink on
-   its own. The grains are already out, so nothing here is feeding them.
+1. Add the infusion ingredients to the strained liquid. The grains are already
+   out, so nothing here is feeding them.
 2. Cover and leave to infuse overnight at room temperature, roughly 8 to 12
    hours. This is the stage that carries the flavour, so do not cut it short.
-3. Strain out the solids. A fine mesh sieve over a jug is enough for mint,
-   ginger or hibiscus. For berries, line the sieve with muslin or a clean tea
-   towel, since crushed fruit leaves pulp that clogs the sieve and later fouls
+3. Strain out the solids through a fine mesh sieve. Line it with muslin or a
+   clean tea towel if you used fruit, since pulp clogs the sieve and later fouls
    the bottle. Do not press the solids through, as that pushes sediment into the
    drink. Let it drain.
 
@@ -68,8 +63,7 @@ plain kefir.
 
 ## X1 Infusion
 
-All optional. Pick one, or skip X1 entirely for plain kefir. The method does not
-change: infuse overnight, strain, then bottle for F2.
+Optional. Skip it for plain kefir, which is a clean drink on its own.
 
 ### Lemon Mint
 
@@ -120,7 +114,8 @@ vinegar here.
 
 ## Appendix
 
-Total elapsed time is roughly 2 to 4 days, most of it unattended.
+Total elapsed time is 2 to 4 days depending on how far you take each stage,
+almost all of it unattended.
 
 ```mermaid
 flowchart LR
