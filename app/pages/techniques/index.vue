@@ -74,7 +74,7 @@ useSeoMeta({
                 name="i-lucide-clock"
                 class="size-3"
               />
-              {{ t.time }} min
+              {{ formatDuration(t.time) }}
             </span>
           </div>
         </NuxtLink>
