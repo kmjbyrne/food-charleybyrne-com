@@ -33,6 +33,7 @@ export interface RecipeMeta {
   diet?: Record<string, boolean>
   keto?: boolean
   paths?: string[]
+  links?: string[]
   time?: number
   prep?: number
   cook?: number

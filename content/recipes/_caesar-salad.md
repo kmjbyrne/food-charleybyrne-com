@@ -1,5 +1,7 @@
 ---
 title: Special Caesar Salad
+links:
+  - /recipes/sauces/basil-caesar-dressing
 paths:
   - keto
 description: Special Caesar salad recipe including some Mediterranean flavours

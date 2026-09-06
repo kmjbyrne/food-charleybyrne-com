@@ -1,5 +1,7 @@
 ---
 title: Ghorkali Chicken Curry
+links:
+  - /recipes/curry/ghorkali-lamb-curry
 description: Non-tomato Nepali green curry with chicken, cooked in an open pan
 category: Curry
 tags:

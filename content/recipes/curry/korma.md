@@ -1,5 +1,7 @@
 ---
 title: Chicken Korma
+links:
+  - /recipes/curry/curry-base
 description: Creamy and aromatic coconut and almond curry
 cover: /korma.jpg
 category: Curry

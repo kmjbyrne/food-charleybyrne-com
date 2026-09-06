@@ -1,5 +1,7 @@
 ---
 title: Croque Monsieur
+links:
+  - /recipes/sauces/bechamel
 category: French
 description: A croque monsieur is a hot sandwich made with ham and cheese
 cover: /croque-monsieur.jpg
