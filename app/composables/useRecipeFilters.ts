@@ -4,12 +4,21 @@ export const useRecipeFilters = () => {
   const route = useRoute()
   const router = useRouter()
 
-  // Category lives in the path (/c/keto/desserts); tag and search stay as query
-  // params so they compose on top of any category.
-  const onIndex = () => route.path === '/' || route.path.startsWith('/c/')
+  // Categories and recipes share one namespace, so a listing page is any route
+  // that is not a recipe or a reserved section.
+  const RESERVED = ['techniques']
+
+  const isListing = computed(() => {
+    const segments = route.path.split('/').filter(Boolean)
+    if (!segments.length) return true
+    if (RESERVED.includes(segments[0]!)) return false
+    return route.meta.isRecipe !== true
+  })
+
+  const onIndex = () => isListing.value
 
   const categoryPath = computed(() =>
-    route.path.startsWith('/c/') ? route.path.slice(3).replace(/\/$/, '') : ''
+    isListing.value ? route.path.replace(/^\/|\/$/g, '') : ''
   )
 
   const applyFilters = (query: Record<string, string | undefined>, path?: string) => {
@@ -26,7 +35,7 @@ export const useRecipeFilters = () => {
 
   const activeCategory = computed({
     get: () => categoryPath.value,
-    set: (v: string) => applyFilters({ tag: undefined }, v ? `/c/${v}` : '/')
+    set: (v: string) => applyFilters({ tag: undefined }, v ? `/${v}` : '/')
   })
 
   const activeTag = computed({

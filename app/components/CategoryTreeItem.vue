@@ -21,7 +21,7 @@ const isExpanded = computed(() => isActive.value || isAncestor.value)
 <template>
   <li>
     <NuxtLink
-      :to="`/c/${node.path}`"
+      :to="`/${node.path}`"
       class="flex items-center gap-2.5 py-1.5 pr-2.5 rounded-md text-sm font-medium transition-all"
       :class="[
         isActive

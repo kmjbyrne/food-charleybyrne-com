@@ -18,7 +18,7 @@ const { activeCategory, activeTag } = useRecipeFilters()
 const { recent, load: loadRecent, clear: clearRecent } = useRecentRecipes()
 
 // The tabs sit over the content column, which only has room on a detail page.
-const isRecipePage = computed(() => route.path.startsWith('/recipes/'))
+const isRecipePage = computed(() => route.meta.isRecipe === true)
 
 onMounted(loadRecent)
 const router = useRouter()
@@ -43,7 +43,7 @@ const tagCounts = computed(() => {
 })
 
 const openCategory = (path: string) => {
-  router.push({ path: path ? `/c/${path}` : '/' })
+  router.push({ path: path ? `/${path}` : '/' })
 }
 
 const filterByTag = (tag: string) => {
@@ -52,7 +52,7 @@ const filterByTag = (tag: string) => {
 
 const openTag = (tag: string) => {
   const next = activeTag.value === tag ? null : tag
-  router.push({ path: route.path.startsWith('/c/') ? route.path : '/', query: { tag: next ?? undefined } })
+  router.push({ path: route.meta.isRecipe ? '/' : route.path, query: { tag: next ?? undefined } })
 }
 </script>
 
@@ -177,9 +177,9 @@ const openTag = (tag: string) => {
             :key="recipe.path"
           >
             <NuxtLink
-              :to="recipe.path"
+              :to="recipeUrl(recipe.path)"
               class="flex items-center gap-2 px-2.5 py-2 rounded-lg transition-all group"
-              :class="$route.path === recipe.path
+              :class="$route.path === recipeUrl(recipe.path)
                 ? 'bg-(--ui-bg) shadow-sm outline outline-1 outline-(--ui-border)'
                 : 'hover:bg-(--ui-bg-elevated)'"
             >
@@ -221,16 +221,16 @@ const openTag = (tag: string) => {
     <NuxtLink
       v-for="r in recent"
       :key="r.path"
-      :to="r.path"
+      :to="recipeUrl(r.path)"
       class="recipe-tab pointer-events-auto flex items-center h-6 pl-1.5 pr-2 w-[190px] overflow-hidden whitespace-nowrap text-[11px] border border-l-0 rounded-r-md shadow-sm transition-all duration-200 hover:translate-x-1"
-      :class="$route.path === r.path
+      :class="$route.path === recipeUrl(r.path)
         ? 'bg-primary-500 border-primary-500 text-white'
         : 'bg-(--ui-bg) border-(--ui-border) text-(--ui-text-muted) hover:text-(--ui-text)'"
       :title="r.title"
     >
       <span
         class="w-1 h-3 rounded-full shrink-0 mr-1.5"
-        :class="$route.path === r.path ? 'bg-white/70' : 'bg-primary-500/50'"
+        :class="$route.path === recipeUrl(r.path) ? 'bg-white/70' : 'bg-primary-500/50'"
       />
       <span class="truncate">{{ r.title }}</span>
     </NuxtLink>

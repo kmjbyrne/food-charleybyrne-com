@@ -23,7 +23,7 @@ export const useRecentRecipes = () => {
   const visit = (recipe: Partial<RecipeMeta> | null | undefined) => {
     if (!recipe?.path || !recipe.title) return
     const entry: RecentRecipe = {
-      path: recipe.path,
+      path: recipeUrl(recipe.path),
       title: recipe.title,
       category: recipe.category
     }

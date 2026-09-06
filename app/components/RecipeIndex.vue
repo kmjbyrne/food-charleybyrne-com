@@ -24,7 +24,7 @@ const crumbs = computed(() => {
     { label: 'All recipes', to: '/' }
   ]
   for (const node of categoryTrail(tree.value, activeCategory.value)) {
-    out.push({ label: node.label, to: `/c/${node.path}` })
+    out.push({ label: node.label, to: `/${node.path}` })
   }
   if (activeTag.value) {
     out.push({
@@ -56,7 +56,7 @@ onMounted(loadRecent)
           <NuxtLink
             v-for="r in recent"
             :key="r.path"
-            :to="r.path"
+            :to="recipeUrl(r.path)"
             class="group flex items-center gap-2 pl-2.5 pr-3 py-1.5 rounded-lg border border-(--ui-border) bg-(--ui-bg) text-[13px] text-(--ui-text-muted) hover:border-primary-500 hover:text-(--ui-text) transition-colors"
           >
             <UIcon
@@ -102,7 +102,7 @@ onMounted(loadRecent)
           v-for="recipe in recipes"
           :key="recipe.path"
           class="flex flex-col gap-1.5 p-1.5 rounded-lg border border-(--ui-border) bg-(--ui-bg) transition-all hover:-translate-y-0.5 hover:shadow-md hover:border-primary-500 cursor-pointer"
-          @click="navigateTo(recipe.path)"
+          @click="navigateTo(recipeUrl(recipe.path))"
         >
           <RecipeThumb
             :title="recipe.title"

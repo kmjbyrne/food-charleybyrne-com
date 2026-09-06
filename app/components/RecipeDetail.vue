@@ -1,23 +1,16 @@
 <script setup lang="ts">
 import type { RecipeMeta, RecipeVariantGroup } from '~/types/recipe'
 
-definePageMeta({})
-
-const route = useRoute()
-const slug = computed(() => {
-  const parts = route.params.slug as string[]
-  return '/recipes/' + parts.join('/')
-})
-
-const { data: recipe } = await useAsyncData(`recipe-${slug.value}`, () =>
-  queryCollection('recipes').path(slug.value).first()
-)
-
-if (!recipe.value) {
-  throw createError({ statusCode: 404, statusMessage: 'Recipe not found' })
+interface Props {
+  recipe: RecipeMeta | null
 }
 
-const { data: related } = await useAsyncData(`related-${slug.value}`, () =>
+const props = defineProps<Props>()
+
+const recipe = computed(() => props.recipe)
+const slug = computed(() => recipe.value?.path ?? '')
+
+const { data: related } = await useAsyncData(() => `related-${slug.value}`, () =>
   queryCollection('recipes')
     .where('category', '=', recipe.value?.category ?? '')
     .where('path', '<>', slug.value)
@@ -58,7 +51,7 @@ const ingredientList = computed(() => collectList('ul'))
 const stepList = computed(() => collectList('ol'))
 
 const site = 'https://food.charleybyrne.com'
-const canonical = computed(() => `${site}${recipe.value?.path ?? ''}`)
+const canonical = computed(() => `${site}${recipeUrl(recipe.value?.path)}`)
 
 useSeoMeta({
   title: () => recipe.value?.title ?? '',
@@ -129,7 +122,7 @@ const cookingMode = ref(false)
 const nutritionOpen = ref(false)
 
 const goToCategory = (category: string) => {
-  navigateTo(`/c/${category.toLowerCase()}`)
+  navigateTo(`/${category.toLowerCase()}`)
 }
 
 // Nested children make the circuit highlight span the whole branch; the top
@@ -350,7 +343,7 @@ const copyRecipe = async () => {
   }
   if (meta.length) header.push('', `_${meta.join(' · ')}_`)
 
-  const body = [...header, ...lines, '', `${location.origin}${recipe.value?.path ?? ''}`]
+  const body = [...header, ...lines, '', `${location.origin}${recipeUrl(recipe.value?.path)}`]
     .join('\n')
     .replace(/\n{3,}/g, '\n\n')
     .trim()
@@ -912,7 +905,7 @@ const fatPct = computed(() =>
           <NuxtLink
             v-for="r in related as RecipeMeta[]"
             :key="r.path"
-            :to="r.path"
+            :to="recipeUrl(r.path)"
             class="flex flex-col gap-2 p-2 rounded-xl border border-(--ui-border) bg-(--ui-bg) transition-all hover:-translate-y-0.5 hover:shadow-md hover:border-primary-500"
           >
             <RecipeThumb

@@ -5,6 +5,16 @@ export default defineNuxtConfig({
     enabled: true
   },
 
+  routeRules: {
+    // Recipes and categories share one namespace now, so the old prefixes
+    // redirect and indexed links keep working.
+    '/recipes/**': { redirect: { to: '/**', statusCode: 301 } },
+    '/c/**': { redirect: { to: '/**', statusCode: 301 } },
+    '/desserts/new-york-style-cheesecake': {
+      redirect: { to: '/desserts/new-york-style-keto-cheesecake', statusCode: 301 }
+    }
+  },
+
   app: {
     head: {
       link: [

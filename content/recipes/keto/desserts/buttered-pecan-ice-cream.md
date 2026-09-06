@@ -23,7 +23,3 @@ diet:
 Still experimenting with the stabiliser: 1 tbsp collagen protein, 2 tbsp vodka,
 or a little xanthan gum. Without one the mass sets rock solid and needs a pick
 axe. The other fix is simply waiting longer for it to thaw, but that is boring.
-
-Still experimenting with the stabiliser: 1 tbsp collagen protein, 2 tbsp vodka,
-or a little xanthan gum. Without one the mass sets rock solid and needs a pick
-axe. The other fix is simply waiting longer for it to thaw, but that is boring.
