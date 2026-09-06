@@ -2,6 +2,7 @@
 import * as cdk from 'aws-cdk-lib/core'
 import { CertificateStack } from '../lib/certificate-stack'
 import { SiteStack } from '../lib/site-stack'
+import { DeployRoleStack } from '../lib/deploy-role-stack'
 import config from '../config'
 
 const app = new cdk.App()
@@ -24,3 +25,18 @@ new SiteStack(app, 'FoodCbComSiteStack', {
   description: 'food.charleybyrne.com — S3 bucket, CloudFront distribution, and Route 53 alias',
   crossRegionReferences: true
 })
+
+// IAM is global; keep the deploy role in its own stack so recreating the site
+// stack never destroys the credentials the pipeline needs to recover. Skipped
+// unless DISTRIBUTION_ID is set, so the site stacks synth on their own.
+if (config.distributionId) {
+  if (!config.githubRepo) {
+    throw new Error('GITHUB_REPO must be set (owner/repo) to deploy DeployRoleStack.')
+  }
+
+  new DeployRoleStack(app, 'FoodCbComDeployRoleStack', {
+    env: { account, region: 'us-east-1' },
+    config,
+    description: 'food.charleybyrne.com — GitHub Actions OIDC deploy role'
+  })
+}

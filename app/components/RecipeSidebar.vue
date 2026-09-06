@@ -24,25 +24,8 @@ onMounted(loadRecent)
 const router = useRouter()
 const route = useRoute()
 
-const CATEGORIES = [
-  { name: 'All', icon: 'i-lucide-grid-2x2' },
-  { name: 'Sauces', icon: 'i-lucide-droplet' },
-  { name: 'Curry', icon: 'i-lucide-flame' },
-  { name: 'Mains', icon: 'i-lucide-utensils' },
-  { name: 'Chicken', icon: 'i-lucide-drumstick' },
-  { name: 'Fish', icon: 'i-lucide-fish' },
-  { name: 'Seafood', icon: 'i-lucide-shell' },
-  { name: 'Sides', icon: 'i-lucide-salad' },
-  { name: 'Bread', icon: 'i-lucide-sandwich' },
-  { name: 'Snacks', icon: 'i-lucide-cookie' },
-  { name: 'Desserts', icon: 'i-lucide-cake' },
-  { name: 'Beverages', icon: 'i-lucide-coffee' },
-  { name: 'Condiments', icon: 'i-lucide-flask-round' },
-  { name: 'Marinades', icon: 'i-lucide-flask-conical' },
-  { name: 'Pastes', icon: 'i-lucide-blend' },
-  { name: 'Keto', icon: 'i-lucide-leaf' }
-]
-
+const allRef = computed(() => props.allRecipes)
+const tree = useCategoryTree(allRef)
 const tagCounts = computed(() => {
   const map: Record<string, number> = {}
   for (const r of props.allRecipes) {
@@ -54,17 +37,8 @@ const tagCounts = computed(() => {
   return Object.entries(map).sort((a, b) => b[1] - a[1]).slice(0, 16)
 })
 
-const categoryCount = (name: string) => {
-  if (name === 'All') return props.allRecipes.length
-  return props.allRecipes.filter(r => matchesCategory(r, name)).length
-}
-
-const filterByCategory = (name: string) => {
-  activeCategory.value = name
-}
-
-const openCategory = (name: string) => {
-  router.push({ path: '/', query: { category: name === 'All' ? undefined : name } })
+const openCategory = (path: string) => {
+  router.push({ path: path ? `/c/${path}` : '/' })
 }
 
 const filterByTag = (tag: string) => {
@@ -73,7 +47,7 @@ const filterByTag = (tag: string) => {
 
 const openTag = (tag: string) => {
   const next = activeTag.value === tag ? null : tag
-  router.push({ path: '/', query: { tag: next ?? undefined, category: activeCategory.value === 'All' ? undefined : activeCategory.value } })
+  router.push({ path: route.path.startsWith('/c/') ? route.path : '/', query: { tag: next ?? undefined } })
 }
 </script>
 
@@ -110,41 +84,32 @@ const openTag = (tag: string) => {
           Categories
         </p>
         <ul class="flex flex-col gap-0.5">
-          <li
-            v-for="cat in CATEGORIES"
-            :key="cat.name"
-            class="group/cat"
-          >
-            <div
-              class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-sm font-medium transition-all cursor-pointer"
-              :class="activeCategory === cat.name
+          <li>
+            <button
+              class="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-sm font-medium transition-all"
+              :class="!activeCategory
                 ? 'bg-primary-500/12 text-primary-500'
                 : 'text-(--ui-text-muted) hover:bg-(--ui-bg-elevated) hover:text-(--ui-text)'"
-              @click="filterByCategory(cat.name)"
+              @click="openCategory('')"
             >
               <UIcon
-                :name="cat.icon"
+                name="i-lucide-grid-2x2"
                 class="size-4 shrink-0"
               />
-              <span class="flex-1 text-left">{{ cat.name }}</span>
+              <span class="flex-1 text-left">All</span>
               <span
                 class="text-xs font-medium px-1.5 py-0.5 rounded-full"
-                :class="activeCategory === cat.name ? 'bg-(--ui-bg) text-primary-500' : 'bg-(--ui-bg-elevated) text-(--ui-text-dimmed)'"
-              >
-                {{ categoryCount(cat.name) }}
-              </span>
-              <button
-                class="opacity-0 group-hover/cat:opacity-100 shrink-0 size-5 grid place-items-center rounded transition-opacity hover:text-primary-500"
-                :title="`Browse ${cat.name} in main view`"
-                @click.stop="openCategory(cat.name)"
-              >
-                <UIcon
-                  name="i-lucide-arrow-right"
-                  class="size-3.5"
-                />
-              </button>
-            </div>
+                :class="!activeCategory ? 'bg-(--ui-bg) text-primary-500' : 'bg-(--ui-bg-elevated) text-(--ui-text-dimmed)'"
+              >{{ allRecipes.length }}</span>
+            </button>
           </li>
+          <CategoryTreeItem
+            v-for="node in tree"
+            :key="node.path"
+            :node="node"
+            :active="activeCategory"
+            :depth="0"
+          />
         </ul>
       </div>
 

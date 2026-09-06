@@ -35,7 +35,7 @@ const cookingMode = ref(false)
 const nutritionOpen = ref(false)
 
 const goToCategory = (category: string) => {
-  navigateTo({ path: '/', query: { category } })
+  navigateTo(`/c/${category.toLowerCase()}`)
 }
 
 // Nested children make the circuit highlight span the whole branch; the top

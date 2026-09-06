@@ -6,7 +6,11 @@ import type { InfraConfig } from '../config'
 
 const testConfig: InfraConfig = {
   domainName: 'food.charleybyrne.com',
-  hostedZoneName: 'charleybyrne.com'
+  hostedZoneName: 'charleybyrne.com',
+  bucketName: 'food-charleybyrne-com',
+  distributionId: 'E1234567890ABC',
+  githubRepo: 'kmjbyrne/food-charleybyrne-com',
+  deployBranch: 'main'
 }
 
 function buildStacks(): { certTemplate: Template, siteTemplate: Template } {

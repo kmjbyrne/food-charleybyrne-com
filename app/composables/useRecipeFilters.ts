@@ -4,14 +4,19 @@ export const useRecipeFilters = () => {
   const route = useRoute()
   const router = useRouter()
 
-  // Filters only render on the index, so applying one from a recipe page has to
-  // navigate there rather than leave a dead query param behind.
-  const onIndex = () => route.path === '/'
+  // Category lives in the path (/c/keto/desserts); tag and search stay as query
+  // params so they compose on top of any category.
+  const onIndex = () => route.path === '/' || route.path.startsWith('/c/')
 
-  const applyFilters = (query: Record<string, string | undefined>) => {
+  const categoryPath = computed(() =>
+    route.path.startsWith('/c/') ? route.path.slice(3).replace(/\/$/, '') : ''
+  )
+
+  const applyFilters = (query: Record<string, string | undefined>, path?: string) => {
     const next = { ...route.query, ...query }
-    if (onIndex()) return router.replace({ path: '/', query: next })
-    return router.push({ path: '/', query: next })
+    const target = path ?? (onIndex() ? route.path : '/')
+    if (onIndex()) return router.replace({ path: target, query: next })
+    return router.push({ path: target, query: next })
   }
 
   const search = computed({
@@ -20,8 +25,8 @@ export const useRecipeFilters = () => {
   })
 
   const activeCategory = computed({
-    get: () => (onIndex() ? (route.query.category as string) ?? 'All' : 'All'),
-    set: (v: string) => applyFilters({ category: v === 'All' ? undefined : v, tag: undefined })
+    get: () => categoryPath.value,
+    set: (v: string) => applyFilters({ tag: undefined }, v ? `/c/${v}` : '/')
   })
 
   const activeTag = computed({
@@ -29,14 +34,12 @@ export const useRecipeFilters = () => {
     set: (v: string | null) => applyFilters({ tag: v?.toLowerCase() ?? undefined })
   })
 
-  return { search, activeCategory, activeTag }
+  return { search, activeCategory, activeTag, categoryPath }
 }
 
-// Some categories (Keto) are directories rather than frontmatter values.
-export const matchesCategory = (r: RecipeMeta, category: string) => {
-  if (r.category === category) return true
-  return r.path?.toLowerCase().split('/').includes(category.toLowerCase()) ?? false
-}
+// A category is a directory path, so a parent includes everything beneath it.
+export const inCategory = (r: RecipeMeta, path: string) =>
+  (r.path ?? '').toLowerCase().startsWith(`/recipes/${path.toLowerCase()}/`)
 
 export const useRecipeList = () => {
   const { search, activeCategory, activeTag } = useRecipeFilters()
@@ -50,7 +53,7 @@ export const useRecipeList = () => {
   const filtered = computed<RecipeMeta[]>(() => {
     const all = (allRecipes.value ?? []) as RecipeMeta[]
     return all.filter((r) => {
-      if (activeCategory.value !== 'All' && !matchesCategory(r, activeCategory.value)) return false
+      if (activeCategory.value && !inCategory(r, activeCategory.value)) return false
       if (activeTag.value && !r.tags?.map(t => t.toLowerCase()).includes(activeTag.value)) return false
       if (search.value) {
         const q = search.value.toLowerCase()
