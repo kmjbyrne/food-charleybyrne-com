@@ -7,29 +7,31 @@ export interface InfraConfig {
   readonly deployBranch: string;
 }
 
-const {
-  DOMAIN_NAME,
-  HOSTED_ZONE_NAME,
-  DISTRIBUTION_ID,
-  GITHUB_REPO,
-  DEPLOY_BRANCH,
-} = process.env;
+// Committed defaults: none of these are secret, and requiring them on every
+// invocation is how the role stack got silently skipped once already.
+const DEFAULTS = {
+  DOMAIN_NAME: "food.charleybyrne.com",
+  HOSTED_ZONE_NAME: "charleybyrne.com",
+  DISTRIBUTION_ID: "E28JG37EYCTSG0",
+  GITHUB_REPO: "kmjbyrne/food-charleybyrne-com",
+  DEPLOY_BRANCH: "main",
+} as const;
 
-if (!DOMAIN_NAME || !HOSTED_ZONE_NAME) {
-  throw new Error("DOMAIN_NAME and HOSTED_ZONE_NAME must be provided for CDK.");
-}
+const DOMAIN_NAME = process.env.DOMAIN_NAME ?? DEFAULTS.DOMAIN_NAME;
+const HOSTED_ZONE_NAME = process.env.HOSTED_ZONE_NAME ?? DEFAULTS.HOSTED_ZONE_NAME;
+const DISTRIBUTION_ID = process.env.DISTRIBUTION_ID ?? DEFAULTS.DISTRIBUTION_ID;
+const GITHUB_REPO = process.env.GITHUB_REPO ?? DEFAULTS.GITHUB_REPO;
+const DEPLOY_BRANCH = process.env.DEPLOY_BRANCH ?? DEFAULTS.DEPLOY_BRANCH;
 
 const config: InfraConfig = {
   domainName: DOMAIN_NAME,
   hostedZoneName: HOSTED_ZONE_NAME,
   bucketName: DOMAIN_NAME.replace(/\./g, "-"),
-  // Empty is tolerated so the site stacks synth without it. bin/cdk.ts skips
-  // DeployRoleStack entirely when it is unset.
-  distributionId: DISTRIBUTION_ID ?? "",
-  // No default: this is the trust boundary, and a baked-in slug would point a
-  // fork's deploy role at the original repo.
-  githubRepo: GITHUB_REPO ?? "",
-  deployBranch: DEPLOY_BRANCH ?? "main",
+  distributionId: DISTRIBUTION_ID,
+  // The trust boundary. Override GITHUB_REPO when deploying from a fork, or the
+  // role will trust the original repo instead.
+  githubRepo: GITHUB_REPO,
+  deployBranch: DEPLOY_BRANCH,
 };
 
 export default config;

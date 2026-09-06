@@ -27,16 +27,9 @@ new SiteStack(app, 'FoodCbComSiteStack', {
 })
 
 // IAM is global; keep the deploy role in its own stack so recreating the site
-// stack never destroys the credentials the pipeline needs to recover. Skipped
-// unless DISTRIBUTION_ID is set, so the site stacks synth on their own.
-if (config.distributionId) {
-  if (!config.githubRepo) {
-    throw new Error('GITHUB_REPO must be set (owner/repo) to deploy DeployRoleStack.')
-  }
-
-  new DeployRoleStack(app, 'FoodCbComDeployRoleStack', {
-    env: { account, region: 'us-east-1' },
-    config,
-    description: 'food.charleybyrne.com — GitHub Actions OIDC deploy role'
-  })
-}
+// stack never destroys the credentials the pipeline needs to recover.
+new DeployRoleStack(app, 'FoodCbComDeployRoleStack', {
+  env: { account, region: 'us-east-1' },
+  config,
+  description: 'food.charleybyrne.com — GitHub Actions OIDC deploy role'
+})
