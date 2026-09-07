@@ -18,7 +18,7 @@ const certStack = new CertificateStack(app, 'FoodCbComCertificateStack', {
 })
 
 // Everything else — S3, OAI, CloudFront, Route 53 — in eu-west-1.
-new SiteStack(app, 'FoodCbComSiteStack', {
+const siteStack = new SiteStack(app, 'FoodCbComSiteStack', {
   env: { account, region: 'eu-west-1' },
   config,
   cert: certStack.cert,
@@ -26,10 +26,13 @@ new SiteStack(app, 'FoodCbComSiteStack', {
   crossRegionReferences: true
 })
 
-// IAM is global; keep the deploy role in its own stack so recreating the site
-// stack never destroys the credentials the pipeline needs to recover.
+// IAM is global, so the role lives in its own stack in us-east-1. It reads the
+// distribution ID across regions rather than hardcoding it, which means
+// destroying SiteStack now requires destroying this stack first.
 new DeployRoleStack(app, 'FoodCbComDeployRoleStack', {
   env: { account, region: 'us-east-1' },
   config,
-  description: 'food.charleybyrne.com — GitHub Actions OIDC deploy role'
+  distribution: siteStack.distribution,
+  description: 'food.charleybyrne.com — GitHub Actions OIDC deploy role',
+  crossRegionReferences: true
 })

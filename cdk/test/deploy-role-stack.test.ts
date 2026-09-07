@@ -1,5 +1,6 @@
 import * as cdk from 'aws-cdk-lib/core'
 import { Template, Match } from 'aws-cdk-lib/assertions'
+import * as cloudfront from 'aws-cdk-lib/aws-cloudfront'
 import { DeployRoleStack } from '../lib/deploy-role-stack'
 import type { InfraConfig } from '../config'
 
@@ -7,16 +8,25 @@ const testConfig: InfraConfig = {
   domainName: 'food.charleybyrne.com',
   hostedZoneName: 'charleybyrne.com',
   bucketName: 'food-charleybyrne-com',
-  distributionId: 'E1234567890ABC',
   githubRepo: 'kmjbyrne/food-charleybyrne-com',
+  githubRepoImmutable: 'kmjbyrne@123/food-charleybyrne-com@456',
   deployBranch: 'main'
 }
 
 function buildTemplate(config: InfraConfig = testConfig): Template {
   const app = new cdk.App()
+  const originStack = new cdk.Stack(app, 'TestOriginStack', {
+    env: { account: '123456789012', region: 'eu-west-1' }
+  })
+  const distribution = cloudfront.Distribution.fromDistributionAttributes(
+    originStack,
+    'ImportedDistribution',
+    { distributionId: 'E1234567890ABC', domainName: 'example.cloudfront.net' }
+  )
   const stack = new DeployRoleStack(app, 'TestDeployRoleStack', {
     env: { account: '123456789012', region: 'us-east-1' },
-    config
+    config,
+    distribution
   })
   return Template.fromStack(stack)
 }
@@ -33,8 +43,10 @@ describe('DeployRoleStack', () => {
                 'token.actions.githubusercontent.com:aud': 'sts.amazonaws.com'
               },
               StringLike: {
-                'token.actions.githubusercontent.com:sub':
-                  'repo:kmjbyrne/food-charleybyrne-com:ref:refs/heads/main'
+                'token.actions.githubusercontent.com:sub': [
+                  'repo:kmjbyrne/food-charleybyrne-com:ref:refs/heads/main',
+                  'repo:kmjbyrne@123/food-charleybyrne-com@456:ref:refs/heads/main'
+                ]
               }
             }
           })

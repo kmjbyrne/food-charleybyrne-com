@@ -14,6 +14,8 @@ export interface SiteStackProps extends cdk.StackProps {
 }
 
 export class SiteStack extends cdk.Stack {
+  readonly distribution: cloudfront.Distribution
+
   constructor(scope: Construct, id: string, props: SiteStackProps) {
     super(scope, id, props)
 
@@ -61,7 +63,7 @@ function handler(event) {
       `)
     })
 
-    const distribution = new cloudfront.Distribution(this, 'SiteDistribution', {
+    this.distribution = new cloudfront.Distribution(this, 'SiteDistribution', {
       defaultBehavior: {
         origin: origins.S3BucketOrigin.withOriginAccessControl(siteBucket),
         viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
@@ -93,7 +95,7 @@ function handler(event) {
     new route53.ARecord(this, 'AliasRecord', {
       zone: hostedZone,
       recordName: config.domainName,
-      target: route53.RecordTarget.fromAlias(new targets.CloudFrontTarget(distribution))
+      target: route53.RecordTarget.fromAlias(new targets.CloudFrontTarget(this.distribution))
     })
 
     new cdk.CfnOutput(this, 'BucketName', {
@@ -102,12 +104,12 @@ function handler(event) {
     })
 
     new cdk.CfnOutput(this, 'DistributionId', {
-      value: distribution.distributionId,
+      value: this.distribution.distributionId,
       description: 'CloudFront distribution ID — invalidate after each deploy'
     })
 
     new cdk.CfnOutput(this, 'DistributionDomainName', {
-      value: distribution.distributionDomainName,
+      value: this.distribution.distributionDomainName,
       description: 'CloudFront domain name'
     })
 

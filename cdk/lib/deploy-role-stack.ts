@@ -1,10 +1,12 @@
 import * as cdk from 'aws-cdk-lib/core'
 import * as iam from 'aws-cdk-lib/aws-iam'
+import type * as cloudfront from 'aws-cdk-lib/aws-cloudfront'
 import type { Construct } from 'constructs'
 import type { InfraConfig } from '../config'
 
 export interface DeployRoleStackProps extends cdk.StackProps {
   readonly config: InfraConfig
+  readonly distribution: cloudfront.IDistribution
 }
 
 const GITHUB_OIDC_URL = 'https://token.actions.githubusercontent.com'
@@ -14,7 +16,7 @@ export class DeployRoleStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: DeployRoleStackProps) {
     super(scope, id, props)
 
-    const { config } = props
+    const { config, distribution } = props
 
     const provider = new iam.OpenIdConnectProvider(this, 'GitHubOidcProvider', {
       url: GITHUB_OIDC_URL,
@@ -23,6 +25,10 @@ export class DeployRoleStack extends cdk.Stack {
 
     // Only the default branch of this one repo may assume the role. Without the
     // sub condition any repo on GitHub could.
+    //
+    // Two patterns because GitHub is migrating to immutable subject claims,
+    // which append numeric owner and repo ids. Both are pinned exactly; a
+    // wildcard between owner and repo would match unrelated repositories.
     const role = new iam.Role(this, 'DeployRole', {
       roleName: `${config.domainName.replace(/\./g, '-')}-deploy`,
       description: `GitHub Actions deploy role for ${config.domainName}`,
@@ -32,7 +38,10 @@ export class DeployRoleStack extends cdk.Stack {
           'token.actions.githubusercontent.com:aud': 'sts.amazonaws.com'
         },
         StringLike: {
-          'token.actions.githubusercontent.com:sub': `repo:${config.githubRepo}:ref:refs/heads/${config.deployBranch}`
+          'token.actions.githubusercontent.com:sub': [
+            `repo:${config.githubRepo}:ref:refs/heads/${config.deployBranch}`,
+            `repo:${config.githubRepoImmutable}:ref:refs/heads/${config.deployBranch}`
+          ]
         }
       })
     })
@@ -61,7 +70,9 @@ export class DeployRoleStack extends cdk.Stack {
       new iam.PolicyStatement({
         sid: 'InvalidateDistribution',
         actions: ['cloudfront:CreateInvalidation'],
-        resources: [`arn:aws:cloudfront::${this.account}:distribution/${config.distributionId}`]
+        resources: [
+          `arn:aws:cloudfront::${this.account}:distribution/${distribution.distributionId}`
+        ]
       })
     )
 

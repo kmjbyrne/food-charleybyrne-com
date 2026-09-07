@@ -8,8 +8,8 @@ const testConfig: InfraConfig = {
   domainName: 'food.charleybyrne.com',
   hostedZoneName: 'charleybyrne.com',
   bucketName: 'food-charleybyrne-com',
-  distributionId: 'E1234567890ABC',
   githubRepo: 'kmjbyrne/food-charleybyrne-com',
+  githubRepoImmutable: 'kmjbyrne@123/food-charleybyrne-com@456',
   deployBranch: 'main'
 }
 
